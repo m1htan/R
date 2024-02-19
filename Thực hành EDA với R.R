@@ -34,6 +34,14 @@ mutate(Timestamp = ymd(Timestamp),
         Month = month(Timestamp),     
         Year = year(Timestamp))
 
+# Thêm hai biến giá trị giao dịch = giá đóng cửa * volume
+data$TransactionValueACB = data$ACB.HM.Volume*data$ACB.HM.Close
+data$TransactionValueBAB = data$BAB.HN.Volume*data$BAB.HN.Close
+
+data <- data %>% 
+mutate(TransactionValueACB = ACB.HM.Volume * ACB.HM.Close,
+      TransactionValueBAB = BAB.HN.Volume * BAB.HN.Close)
+
 # Vẽ biểu đồ Histogram
 ggplot(data=data) + geom_histogram(mapping = aes(x = ACB.HM.Close), binwidth = 200)
 ggplot(data=data) + geom_histogram(mapping = aes(x = ACB.HM.Volume), binwidth = 200000)
