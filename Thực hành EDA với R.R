@@ -12,6 +12,27 @@ write_xlsx(data, "data.xlsx")
 
 #################################################################################################################
 
+# Tách dữ liệu cho ACB.HM vào df1
+df1 <- data[, c("ID", "Timestamp", "ACB.HM.Close", "ACB.HM.Volume")]
+
+# Tách dữ liệu cho BAB.HN vào df2
+df2 <- data[, c("ID", "Timestamp", "BAB.HN.Close", "BAB.HN.Volume")]
+
+df1 <- na.exclude(df1)
+df2 <- na.exclude(df2)
+
+df1
+df2
+length(which(is.na(df1$ACB.HM.Close)))
+length(which(is.na(df1$ACB.HM.Volume)))
+length(which(is.na(df2$BAB.HN.Close)))
+length(which(is.na(df2$BAB.HN.Volume)))
+
+
+data <- merge(df1, df2, by = c("ID", "Timestamp"), all = TRUE)
+
+#################################################################################################################
+
 # Kiểm tra đặc trưng của biến:
 dim(data)
 nrow(data)
@@ -19,14 +40,6 @@ ncol(data)
 str(data)
 basic_info <- str(data)
 statistical_description <- summary(data)
-
-# Tiền xử lý dữ liệu
-null_counts <- colSums(is.na(data)) # Kiểm tra các giá trị null 
-null_counts
-
-data <- na.omit(data) # Xóa các giá trị null 
-null_counts <- colSums(is.na(data))  
-null_counts
 
 #################################################################################################################
 
@@ -201,7 +214,7 @@ data$Timestamp <- as.POSIXct(data$Timestamp)
 data <- data %>%
   mutate(Year = year(Timestamp),
          Month = month(Timestamp))
-
+        
 # Lọc dữ liệu cho năm 2021
 data_2021 <- data %>%
   filter(Year == 2021)
@@ -476,6 +489,138 @@ ggplot(daily_max_transaction_bab_may_2021, aes(x = Date, y = Max_TransactionValu
   theme_minimal()
 
 #################################################################################################################
+
+# Lọc dữ liệu cho tháng 7 của ngân hàng ACB
+data_july_acb <- data %>%
+  filter(Year == 2021, Month == 7) %>%
+  select(Timestamp, ACB.HM.Close) %>%
+  mutate(Weekday = wday(Timestamp))
+
+# Tính toán giá đóng cửa trung bình theo thứ trong tuần
+weekday_avg_close <- data_july_acb %>%
+  group_by(Weekday) %>%
+  summarize(Avg_Close = mean(ACB.HM.Close))
+
+# Đổi tên thứ trong tuần từ số sang tên
+weekday_avg_close$Weekday <- factor(weekday_avg_close$Weekday, levels = 1:7, labels = c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"))
+
+# Vẽ biểu đồ cột thể hiện giá đóng cửa trung bình theo thứ trong tuần
+ggplot(weekday_avg_close, aes(x = Weekday, y = Avg_Close)) +
+  geom_col(fill = "skyblue", color = "black", width = 0.5) +
+  labs(title = "Giá Đóng Cửa Trung Bình Theo Thứ Trong Tháng 7 Của Ngân Hàng ACB",
+       x = "Thứ trong Tuần",
+       y = "Giá Đóng Cửa Trung Bình") +
+  theme_minimal()
+
+
+# Lọc dữ liệu cho tháng 3 của ngân hàng BAB
+data_march_bab <- data %>%
+  filter(Year == 2021, Month == 3)
+
+# Tính giá đóng cửa trung bình theo thứ trong tháng 3 của ngân hàng BAB
+weekday_avg_close_bab_march <- data_march_bab %>%
+  group_by(Weekday = wday(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Avg_Close = mean(BAB.HN.Close, na.rm = TRUE))
+
+# Vẽ biểu đồ cột với cột nhỏ lại
+ggplot(weekday_avg_close_bab_march, aes(x = Weekday, y = Avg_Close)) +
+  geom_col(fill = "skyblue", color = "black", width = 0.5) +
+  labs(title = "Giá Đóng Cửa Trung Bình Theo Thứ Trong Tháng 3 Của Ngân Hàng BAB",
+       x = "Thứ trong Tuần",
+       y = "Giá Đóng Cửa Trung Bình") +
+  theme_minimal()
+
+#################################################################################################################
+
+# Lọc dữ liệu cho tháng 2 của ngân hàng ACB
+data_feb_acb <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 2)
+
+# Tính khối lượng giao dịch trung bình theo thứ trong tháng 2 của ngân hàng ACB
+weekday_avg_volume_acb_feb <- data_feb_acb %>%
+  group_by(Weekday = wday(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Avg_Volume = mean(ACB.HM.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ cột
+ggplot(weekday_avg_volume_acb_feb, aes(x = Weekday, y = Avg_Volume)) +
+  geom_col(fill = "lightblue", color = "black", width=0.5) +
+  labs(title = "Khối Lượng Giao Dịch Trung Bình Theo Thứ Trong Tháng 2 của ngân hàng ACB",
+       x = "Thứ trong Tuần",
+       y = "Khối Lượng Giao Dịch Trung Bình") +
+  theme_minimal()
+
+# Lọc dữ liệu cho tháng 5 của ngân hàng BAB
+data_may_bab <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 5)
+
+# Tính khối lượng giao dịch trung bình theo thứ trong tháng 5 của ngân hàng BAB
+weekday_avg_volume_bab_may <- data_may_bab %>%
+  group_by(Weekday = wday(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Avg_Volume = mean(BAB.HN.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ cột
+ggplot(weekday_avg_volume_bab_may, aes(x = Weekday, y = Avg_Volume)) +
+  geom_col(fill = "lightblue", color = "black", width=0.5) +
+  labs(title = "Khối Lượng Giao Dịch Trung Bình Theo Thứ Trong Tháng 5 của ngân hàng BAB",
+       x = "Thứ trong Tuần",
+       y = "Khối Lượng Giao Dịch Trung Bình") +
+  theme_minimal()
+
+#################################################################################################################
+
+# Lọc dữ liệu cho tháng 7 của ngân hàng ACB
+data_july_acb <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 7)
+
+# Tính giá trị giao dịch trung bình theo thứ trong tháng 7 của ngân hàng ACB
+weekday_avg_transaction_acb_july <- data_july_acb %>%
+  group_by(Weekday = wday(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Avg_TransactionValueACB = mean(TransactionValueACB, na.rm = TRUE))
+
+# Vẽ biểu đồ cột
+ggplot(weekday_avg_transaction_acb_july, aes(x = Weekday, y = Avg_TransactionValueACB)) +
+  geom_col(fill = "lightblue", color = "black", width=0.5) +
+  labs(title = "Giá Trị Giao Dịch Trung Bình Theo Thứ Trong Tháng 7 của ngân hàng ACB",
+       x = "Thứ trong Tuần",
+       y = "Giá Trị Giao Dịch Trung Bình (ACB)",
+       fill = "Ngân hàng") +
+  theme_minimal()
+
+# Lọc dữ liệu cho tháng 5 của ngân hàng BAB
+data_may_bab <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 5)
+
+# Tính giá trị giao dịch trung bình theo thứ trong tháng 5 của ngân hàng BAB
+weekday_avg_transaction_bab_may <- data_may_bab %>%
+  group_by(Weekday = wday(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Avg_TransactionValueBAB = mean(TransactionValueBAB, na.rm = TRUE))
+
+# Vẽ biểu đồ cột
+ggplot(weekday_avg_transaction_bab_may, aes(x = Weekday, y = Avg_TransactionValueBAB)) +
+  geom_col(fill = "lightblue", color = "black", width=0.5) +
+  labs(title = "Giá Trị Giao Dịch Trung Bình Theo Thứ Trong Tháng 5 của BAB",
+       x = "Thứ trong Tuần",
+       y = "Giá Trị Giao Dịch Trung Bình (BAB)",
+       fill = "Ngân hàng") +
+  theme_minimal()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
