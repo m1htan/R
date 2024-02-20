@@ -272,6 +272,213 @@ ggplot(data_march_2021, aes(x = Timestamp, y = BAB.HN.Close)) +
 
 #################################################################################################################
 
+# Tính toán khối lượng giao dịch cao nhất của mỗi năm cho ACB.HM và BAB.HN
+yearly_max_volume <- data %>%
+  group_by(Year = year(Timestamp)) %>%
+  summarize(Max_Volume_ACB = max(ACB.HM.Volume, na.rm = TRUE),
+            Max_Volume_BAB = max(BAB.HN.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ đường cho khối lượng giao dịch cao nhất của mỗi năm
+ggplot(yearly_max_volume, aes(x = Year)) +
+  geom_line(aes(y = Max_Volume_ACB, color = "ACB.HM")) +
+  geom_point(aes(y = Max_Volume_ACB, color = "ACB.HM")) +
+  geom_line(aes(y = Max_Volume_BAB, color = "BAB.HN")) +
+  geom_point(aes(y = Max_Volume_BAB, color = "BAB.HN")) +
+  labs(title = "Khối Lượng Giao Dịch Cao Nhất của ACB.HM và BAB.HN theo Năm",
+       x = "Năm",
+       y = "Khối Lượng Giao Dịch Cao Nhất",
+       color = "Ngân hàng") +
+  scale_color_manual(values = c("ACB.HM" = "blue", "BAB.HN" = "red")) +
+  theme_minimal()
+
+#################################################################################################################
+
+# Lọc dữ liệu cho năm 2021
+data_2021 <- data %>%
+  filter(year(Timestamp) == 2021)
+
+# Tính toán khối lượng giao dịch cao nhất của ACB cho mỗi tháng trong năm 2021
+monthly_max_volume_acb_2021 <- data_2021 %>%
+  group_by(Month = month(Timestamp)) %>%
+  summarize(Max_Volume_ACB = max(ACB.HM.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện khối lượng giao dịch cao nhất theo từng tháng
+ggplot(monthly_max_volume_acb_2021, aes(x = Month, y = Max_Volume_ACB)) +
+  geom_line(color = "blue", size = 1) + 
+  geom_point(color = "red", size = 2) + 
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +
+  labs(title = "Khối Lượng Giao Dịch Cao Nhất Của ACB Theo Tháng Trong Năm 2021",
+       x = "Tháng",
+       y = "Khối Lượng Giao Dịch Cao Nhất") +
+  theme_minimal()
+
+
+# Lọc dữ liệu cho năm 2021
+data_2021_bab <- data %>%
+  filter(year(Timestamp) == 2021)
+
+# Tính toán khối lượng giao dịch cao nhất của BAB cho mỗi tháng trong năm 2021
+monthly_max_volume_bab_2021 <- data_2021_bab %>%
+  group_by(Month = month(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Max_Volume_BAB = max(BAB.HN.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện khối lượng giao dịch cao nhất theo từng tháng
+ggplot(monthly_max_volume_bab_2021, aes(x = Month, y = Max_Volume_BAB, group=1)) +
+  geom_line(color = "blue", size = 1) + 
+  geom_point(color = "red", size = 2) + 
+  labs(title = "Khối Lượng Giao Dịch Cao Nhất Của BAB Theo Tháng Trong Năm 2021",
+       x = "Tháng",
+       y = "Khối Lượng Giao Dịch Cao Nhất") +
+  theme_minimal()
+
+#################################################################################################################
+
+# Lọc dữ liệu cho tháng 2 năm 2021
+data_feb_2021_acb <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 2)
+
+# Tính toán khối lượng giao dịch cao nhất mỗi ngày trong tháng 2 năm 2021 cho ACB
+daily_max_volume_acb_feb_2021 <- data_feb_2021_acb %>%
+  group_by(Date = as.Date(Timestamp)) %>%
+  summarize(Max_Volume_ACB = max(ACB.HM.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện khối lượng giao dịch cao nhất của ACB trong tháng 2 năm 2021
+ggplot(daily_max_volume_acb_feb_2021, aes(x = Date, y = Max_Volume_ACB)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Khối Lượng Giao Dịch Cao Nhất của ACB trong Tháng 2 Năm 2021",
+       x = "Ngày",
+       y = "Khối Lượng Giao Dịch Cao Nhất") +
+  theme_minimal()
+
+
+# Lọc dữ liệu cho tháng 5 năm 2021 của ngân hàng BAB
+data_may_2021_bab <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 5)
+
+# Tính toán khối lượng giao dịch cao nhất mỗi ngày trong tháng 5 năm 2021 cho BAB
+daily_max_volume_bab_may_2021 <- data_may_2021_bab %>%
+  group_by(Date = as.Date(Timestamp)) %>%
+  summarize(Max_Volume_BAB = max(BAB.HN.Volume, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện khối lượng giao dịch cao nhất của BAB trong tháng 5 năm 2021
+ggplot(daily_max_volume_bab_may_2021, aes(x = Date, y = Max_Volume_BAB)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Khối Lượng Giao Dịch Cao Nhất của BAB trong Tháng 5 Năm 2021",
+       x = "Ngày",
+       y = "Khối Lượng Giao Dịch Cao Nhất") +
+  theme_minimal()
+
+#################################################################################################################
+
+# Tóm tắt dữ liệu để chọn giá trị giao dịch cao nhất của mỗi năm cho ACB và BAB
+yearly_max_transaction <- data %>%
+  group_by(Year) %>%
+  summarize(Max_TransactionValueACB = max(TransactionValueACB),
+            Max_TransactionValueBAB = max(TransactionValueBAB))
+
+# Gộp dữ liệu thành một dataframe
+yearly_max_transaction <- gather(yearly_max_transaction, Bank, Max_Value, -Year)
+
+# Vẽ biểu đồ line
+ggplot(yearly_max_transaction, aes(x = Year, y = Max_Value, color = Bank)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Giá trị giao dịch cao nhất qua từng năm của ACB và BAB",
+       x = "Năm",
+       y = "Giá trị giao dịch cao nhất",
+       color = "Ngân hàng") +
+  theme_minimal()
+
+#################################################################################################################
+
+# Lọc dữ liệu cho năm 2021
+data_2021_acb <- data %>%
+  filter(year(Timestamp) == 2021)
+
+# Tính toán giá trị giao dịch cao nhất của ACB cho mỗi tháng trong năm 2021
+monthly_max_transaction_acb_2021 <- data_2021_acb %>%
+  group_by(Month = month(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Max_TransactionValueACB = max(TransactionValueACB, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện giá trị giao dịch cao nhất của ACB theo từng tháng trong năm 2021
+ggplot(monthly_max_transaction_acb_2021, aes(x = Month, y = Max_TransactionValueACB, group=1)) +
+  geom_line(color = "blue", size = 1) + 
+  geom_point(color = "red", size = 2) + 
+  labs(title = "Giá trị Giao Dịch Cao Nhất của ACB Theo Tháng Trong Năm 2021",
+       x = "Tháng",
+       y = "Giá trị Giao Dịch Cao Nhất") +
+  scale_x_discrete(labels = month.abb) + 
+  theme_minimal()
+
+
+# Lọc dữ liệu cho năm 2021
+data_2021_bab <- data %>%
+  filter(year(Timestamp) == 2021)
+
+# Tính toán giá trị giao dịch cao nhất của BAB cho mỗi tháng trong năm 2021
+monthly_max_transaction_bab_2021 <- data_2021_bab %>%
+  group_by(Month = month(Timestamp, label = TRUE, abbr = TRUE)) %>%
+  summarize(Max_TransactionValueBAB = max(TransactionValueBAB, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện giá trị giao dịch cao nhất của BAB theo từng tháng trong năm 2021
+ggplot(monthly_max_transaction_bab_2021, aes(x = Month, y = Max_TransactionValueBAB, group=1)) +
+  geom_line(color = "blue", size = 1) + 
+  geom_point(color = "red", size = 2) + 
+  labs(title = "Giá trị Giao Dịch Cao Nhất của BAB Theo Tháng Trong Năm 2021",
+       x = "Tháng",
+       y = "Giá trị Giao Dịch Cao Nhất") +
+  scale_x_discrete(labels = month.abb) + 
+  theme_minimal()
+
+#################################################################################################################
+
+# Lọc dữ liệu cho tháng 7 năm 2021 của ngân hàng ACB
+data_july_2021_acb <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 7)
+
+# Tính toán giá trị giao dịch cao nhất mỗi ngày trong tháng 7 năm 2021 cho ACB
+daily_max_transaction_acb_july_2021 <- data_july_2021_acb %>%
+  group_by(Date = as.Date(Timestamp)) %>%
+  summarize(Max_TransactionValueACB = max(TransactionValueACB, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện giá trị giao dịch cao nhất của ACB trong tháng 7 năm 2021
+ggplot(daily_max_transaction_acb_july_2021, aes(x = Date, y = Max_TransactionValueACB)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Giá Trị Giao Dịch Cao Nhất của ACB trong Tháng 7 Năm 2021",
+       x = "Ngày",
+       y = "Giá Trị Giao Dịch Cao Nhất") +
+  theme_minimal()
+
+
+# Lọc dữ liệu cho tháng 5 năm 2021 của ngân hàng BAB
+data_may_2021_bab <- data %>%
+  mutate(Year = year(Timestamp), Month = month(Timestamp)) %>%
+  filter(Year == 2021, Month == 5)
+
+# Tính toán giá trị giao dịch cao nhất mỗi ngày trong tháng 5 năm 2021 cho BAB
+daily_max_transaction_bab_may_2021 <- data_may_2021_bab %>%
+  group_by(Date = as.Date(Timestamp)) %>%
+  summarize(Max_TransactionValueBAB = max(TransactionValueBAB, na.rm = TRUE))
+
+# Vẽ biểu đồ đường thể hiện giá trị giao dịch cao nhất của BAB trong tháng 5 năm 2021
+ggplot(daily_max_transaction_bab_may_2021, aes(x = Date, y = Max_TransactionValueBAB)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Giá Trị Giao Dịch Cao Nhất của BAB trong Tháng 5 Năm 2021",
+       x = "Ngày",
+       y = "Giá Trị Giao Dịch Cao Nhất") +
+  theme_minimal()
+
+#################################################################################################################
+
+
+
 
 
 
