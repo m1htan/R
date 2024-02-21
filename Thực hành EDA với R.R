@@ -64,10 +64,13 @@ mutate(TransactionValueACB = ACB.HM.Volume * ACB.HM.Close,
 # Vẽ biểu đồ Histogram
 ggplot(data=data, main = ACB.HM.Close) + 
   geom_histogram(mapping = aes(x = ACB.HM.Close), binwidth = 200)
+
 ggplot(data=data, main = ACB.HM.Volume) + 
   geom_histogram(mapping = aes(x = ACB.HM.Volume), binwidth = 200000)
+
 ggplot(data=data, main = BAB.HN.Close) + 
   geom_histogram(mapping = aes(x = BAB.HN.Close), binwidth = 200)
+
 ggplot(data=data, main = BAB.HN.Volume) + 
   geom_histogram(mapping = aes(x = BAB.HN.Volume), binwidth = 20000)
 
@@ -161,7 +164,7 @@ yearly_max_close <- data %>%
   summarize(Max_Close = max(ACB.HM.Close))
   
 # Tạo biểu đồ đường cho giá đóng cửa cao nhất của mỗi năm của ngân hàng ACB 
-ggplot(yearly_max_close, aes(x = Year, y = Max_Close)) +
+ggplot(yearly_max_close, aes(x = Year, y = Max_Close, group=1)) +
   geom_line() +
   geom_point() +
   labs(title = "Giá Đóng Cửa Cao Nhất của ACB theo Năm",
@@ -193,7 +196,7 @@ yearly_max_close <- data %>%
             Max_Close_BAB = max(BAB.HN.Close))
 
 # Tạo biểu đồ đường cho giá đóng cửa cao nhất của mỗi năm cho cả ACB.HM và BAB.HN
-ggplot(yearly_max_close, aes(x = Year)) +
+ggplot(yearly_max_close, aes(x = Year, group=1)) +
   geom_line(aes(y = Max_Close_ACB, color = "ACB.HM")) +
   geom_point(aes(y = Max_Close_ACB, color = "ACB.HM")) +
   geom_line(aes(y = Max_Close_BAB, color = "BAB.HN")) +
@@ -607,6 +610,16 @@ ggplot(weekday_avg_transaction_bab_may, aes(x = Weekday, y = Avg_TransactionValu
        y = "Giá Trị Giao Dịch Trung Bình (BAB)",
        fill = "Ngân hàng") +
   theme_minimal()
+
+#################################################################################################################
+
+
+
+
+
+
+
+
 
 
 
