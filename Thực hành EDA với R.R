@@ -613,36 +613,36 @@ ggplot(weekday_avg_transaction_bab_may, aes(x = Weekday, y = Avg_TransactionValu
 
 #################################################################################################################
 
+# Vẽ đồ thị Probability Distributions
+ggplot(data=data, aes(x = ACB.HM.Close)) + 
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  labs(title = "Phân Phối Xác Suất của ACB.HM.Close",
+       x = "Giá Đóng Cửa",
+       y = "Mật Độ Xác Suất") +
+  theme_minimal()
 
 
+ggplot(data=data, aes(x = ACB.HM.Volume)) + 
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  labs(title = "Phân Phối Xác Suất của ACB.HM.Volume",
+       x = "Khối lượng giao dịch",
+       y = "Mật Độ Xác Suất") +
+  theme_minimal()
 
 
+ggplot(data=data, aes(x = BAB.HN.Close)) + 
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  labs(title = "Phân Phối Xác Suất của BAB.HN.Close",
+       x = "Giá Đóng Cửa",
+       y = "Mật Độ Xác Suất") +
+  theme_minimal()
 
 
+ggplot(data=data, aes(x = BAB.HN.Volume)) + 
+  geom_density(fill = "skyblue", alpha = 0.5) +
+  labs(title = "Phân Phối Xác Suất của BAB.HN.Volume",
+       x = "Khối lượng giao dịch",
+       y = "Mật Độ Xác Suất") +
+  theme_minimal()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#################################################################################################################
