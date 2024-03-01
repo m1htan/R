@@ -1,0 +1,85 @@
+---
+title: "R_Facebook text mining"
+author: "Minh Tan"
+date: "2024-03-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Đọc vào file dữ liệu:
+
+```{r cars}
+library(readxl)
+fanpost_data <- read_excel("D:/UEL/Lectures/Data Analytics with R/Data Analytics with R/data/fanpost_Lotteria Vietnam_W4.xlsx")
+head(fanpost_data)
+View(fanpost_data)
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+# convert to a data frame
+df <- fanpost_data$message
+head(df)
+# build a corpus
+myCorpus <- Corpus(VectorSource(df))
+inspect(myCorpus)
+# convert to lower case
+#myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+myCorpus <- tm_map(myCorpus, tolower)
+# remove punctuations and numbers
+myCorpus <- tm_map(myCorpus, removePunctuation) 
+inspect(myCorpus)[1:5]
+myCorpus <- tm_map(myCorpus, removeNumbers)
+
+# remove 'r' and 'big' from stopwords
+myStopwords <- c("thì", "mà", "là")
+# remove stopwords
+myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
+
+# keep a copy of corpus myCorpusCopy <- myCorpus # stem words
+#myCorpus <- tm_map(myCorpus, stemDocument)
+# stem completion
+#myCorpus <- tm_map(myCorpus, stemCompletion,
+#dictionary = myCorpusCopy)
+# replace "miners" with "mining", because "mining" was
+# first stemmed to "mine" and then completed to "miners"
+#myCorpus <- tm_map(myCorpus, gsub, pattern="miners",
+#replacement="mining") strwrap(myCorpus[320], width=55)
+
+myTdm <- TermDocumentMatrix(myCorpus,control=list(wordLengths=c(1,Inf)))
+# inspect frequent words
+(freq.terms <- findFreqTerms(myTdm, lowfreq=300))
+
+# which words are associated with 'lotteria'?
+findAssocs(myTdm, "lotteria", 0.2)
+# which words are associated with 'ngon'?
+findAssocs(myTdm, "ngon", 0.2)
+
+# install.packages("Rtools")
+# 
+# install.packages("graph")
+# 
+# install.packages("Rgraphviz")
+# 
+# library(graph) 
+# library(Rgraphviz)
+# plot(myTdm, term=freq.terms, corThreshold=0.1, weighting=T)
+# 
+# library(wordcloud)
+# m <- as.matrix(myTdm)
+# freq <- sort(rowSums(m), decreasing=T)
+# wordcloud(words=names(freq), freq=freq, min.freq=4, random.order=F)
+
+
+## [1] "r reference card data mining now available cran list" ## [2] "used r functions package data mining applications"
+```
+
