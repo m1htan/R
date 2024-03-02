@@ -10,14 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
-
 Đọc vào file dữ liệu:
-
+summary(data)
 ```{r cars}
 library(readxl)
-fanpost_data <- read_excel("D:/UEL/Lectures/Data Analytics with R/Data Analytics with R/data/fanpost_Lotteria Vietnam_W4.xlsx")
-head(fanpost_data)
-View(fanpost_data)
+data <- read_excel("C:/Users/Minh Tan/Downloads/fanpost_Lotteria Vietnam_W4.xlsx")
+head(data)
+View(data)
 
 ```
 
@@ -82,4 +81,3 @@ findAssocs(myTdm, "ngon", 0.2)
 
 ## [1] "r reference card data mining now available cran list" ## [2] "used r functions package data mining applications"
 ```
-
