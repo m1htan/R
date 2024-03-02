@@ -10,8 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
-Đọc vào file dữ liệu:
-summary(data)
+
+Đọc vào file dữ liệu: summary(data)
+
 ```{r cars}
 library(readxl)
 data <- read_excel("C:/Users/Minh Tan/Downloads/fanpost_Lotteria Vietnam_W4.xlsx")
@@ -26,24 +27,32 @@ You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
 # convert to a data frame
-df <- fanpost_data$message
+df <- data$message
 head(df)
+
 # build a corpus
 myCorpus <- Corpus(VectorSource(df))
-inspect(myCorpus)
+
 # convert to lower case
-#myCorpus <- tm_map(myCorpus, content_transformer(tolower))
 myCorpus <- tm_map(myCorpus, tolower)
+
+```
+
+```{r}
 # remove punctuations and numbers
 myCorpus <- tm_map(myCorpus, removePunctuation) 
 inspect(myCorpus)[1:5]
 myCorpus <- tm_map(myCorpus, removeNumbers)
+```
 
-# remove 'r' and 'big' from stopwords
+```{r}
+# make stopwords list
 myStopwords <- c("thì", "mà", "là")
 # remove stopwords
 myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
+```
 
+```{r}
 # keep a copy of corpus myCorpusCopy <- myCorpus # stem words
 #myCorpus <- tm_map(myCorpus, stemDocument)
 # stem completion
@@ -53,16 +62,22 @@ myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
 # first stemmed to "mine" and then completed to "miners"
 #myCorpus <- tm_map(myCorpus, gsub, pattern="miners",
 #replacement="mining") strwrap(myCorpus[320], width=55)
+```
 
+```{r}
 myTdm <- TermDocumentMatrix(myCorpus,control=list(wordLengths=c(1,Inf)))
 # inspect frequent words
 (freq.terms <- findFreqTerms(myTdm, lowfreq=300))
+```
 
+```{r}
 # which words are associated with 'lotteria'?
 findAssocs(myTdm, "lotteria", 0.2)
 # which words are associated with 'ngon'?
 findAssocs(myTdm, "ngon", 0.2)
+```
 
+```{r}
 # install.packages("Rtools")
 # 
 # install.packages("graph")
@@ -79,5 +94,6 @@ findAssocs(myTdm, "ngon", 0.2)
 # wordcloud(words=names(freq), freq=freq, min.freq=4, random.order=F)
 
 
-## [1] "r reference card data mining now available cran list" ## [2] "used r functions package data mining applications"
+## [1] "r reference card data mining now available cran list" 
+## [2] "used r functions package data mining applications"
 ```
