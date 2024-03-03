@@ -95,20 +95,18 @@ library(reshape2)
 #Biểu đồ TDM
 plot(myTdm, term=freq.terms, corThreshold=0.1, weighting=T)
 
-# Chuyển ma trận từ - tài liệu thành dạng dữ liệu phù hợp
-tdm_df <- as.data.frame(as.matrix(myTdm))
-tdm_df$term <- rownames(tdm_df)
-tdm_df_long <- melt(tdm_df, id.vars = "term", variable.name = "Document", value.name = "Frequency")
+top_n <- 10 
+freq_df <- data.frame(word = names(freq), frequency = freq)
+top_words <- head(freq_df, top_n)
 
-# Tạo biểu đồ
-ggplot(tdm_df_long, aes(x = term, y = Document, fill = Frequency)) +
-  geom_tile(color = "white") +
-  scale_fill_gradient(low = "white", high = "steelblue") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+ggplot(top_words, aes(x = reorder(word, frequency), y = frequency)) +
+  geom_col() +
+  coord_flip() +
+  xlab("Word") +
+  ylab("Frequency") +
+  ggtitle("Top Words in Term Document Matrix")
 
 #################################################################################################################
-
 library(wordcloud)
 m <- as.matrix(myTdm)
 freq <- sort(rowSums(m), decreasing=T)
