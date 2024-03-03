@@ -41,7 +41,6 @@ myCorpus <- tm_map(myCorpus, tolower)
 ```{r}
 # remove punctuations and numbers
 myCorpus <- tm_map(myCorpus, removePunctuation) 
-inspect(myCorpus)[1:5]
 myCorpus <- tm_map(myCorpus, removeNumbers)
 ```
 
@@ -63,11 +62,14 @@ myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
 #myCorpus <- tm_map(myCorpus, gsub, pattern="miners",
 #replacement="mining") strwrap(myCorpus[320], width=55)
 ```
-
+library(tm)
 ```{r}
+# TDM
 myTdm <- TermDocumentMatrix(myCorpus,control=list(wordLengths=c(1,Inf)))
 # inspect frequent words
 (freq.terms <- findFreqTerms(myTdm, lowfreq=300))
+# Sắp xếp các từ theo thứ tự giảm dần của tần suất xuất hiện
+sorted_freq <- sort(freq.terms, decreasing = TRUE)
 ```
 
 ```{r}
@@ -78,21 +80,41 @@ findAssocs(myTdm, "ngon", 0.2)
 ```
 
 ```{r}
-# install.packages("Rtools")
-# 
-# install.packages("graph")
-# 
-# install.packages("Rgraphviz")
-# 
-# library(graph) 
-# library(Rgraphviz)
-# plot(myTdm, term=freq.terms, corThreshold=0.1, weighting=T)
-# 
-# library(wordcloud)
-# m <- as.matrix(myTdm)
-# freq <- sort(rowSums(m), decreasing=T)
-# wordcloud(words=names(freq), freq=freq, min.freq=4, random.order=F)
+#install.packages("Rtools")
+#install.packages("graph")
+#install.packages("Rgraphviz")
 
+#library(graph) 
+#library(Rgraphviz)
+
+#################################################################################################################
+
+library(tidyverse)
+library(reshape2)
+
+#Biểu đồ TDM
+plot(myTdm, term=freq.terms, corThreshold=0.1, weighting=T)
+
+# Chuyển ma trận từ - tài liệu thành dạng dữ liệu phù hợp
+tdm_df <- as.data.frame(as.matrix(myTdm))
+tdm_df$term <- rownames(tdm_df)
+tdm_df_long <- melt(tdm_df, id.vars = "term", variable.name = "Document", value.name = "Frequency")
+
+# Tạo biểu đồ
+ggplot(tdm_df_long, aes(x = term, y = Document, fill = Frequency)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#################################################################################################################
+
+library(wordcloud)
+m <- as.matrix(myTdm)
+freq <- sort(rowSums(m), decreasing=T)
+wordcloud(words=names(freq), freq=freq, min.freq=4, random.order=F)
+
+#################################################################################################################
 
 ## [1] "r reference card data mining now available cran list" 
 ## [2] "used r functions package data mining applications"
