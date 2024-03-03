@@ -63,6 +63,7 @@ myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
 #replacement="mining") strwrap(myCorpus[320], width=55)
 ```
 library(tm)
+
 ```{r}
 # TDM
 myTdm <- TermDocumentMatrix(myCorpus,control=list(wordLengths=c(1,Inf)))
@@ -99,6 +100,7 @@ top_n <- 10
 freq_df <- data.frame(word = names(freq), frequency = freq)
 top_words <- head(freq_df, top_n)
 
+# Vẽ biểu đồ
 ggplot(top_words, aes(x = reorder(word, frequency), y = frequency)) +
   geom_col() +
   coord_flip() +
@@ -110,10 +112,62 @@ ggplot(top_words, aes(x = reorder(word, frequency), y = frequency)) +
 library(wordcloud)
 m <- as.matrix(myTdm)
 freq <- sort(rowSums(m), decreasing=T)
-wordcloud(words=names(freq), freq=freq, min.freq=4, random.order=F)
-
+wordcloud(words=names(freq), freq=freq, min.freq=300, random.order=F)
 #################################################################################################################
 
 ## [1] "r reference card data mining now available cran list" 
 ## [2] "used r functions package data mining applications"
 ```
+
+```{r}
+library(lubridate)
+
+# Chuyển đổi cột create_time thành POSIXct
+data$create_time <- ymd_hms(data$create_time)
+# Tách cột thời gian đăng bài thành ngày tháng năm và Giờ
+data$Date <- as.Date(data$create_time)
+data$Time <- format(as.POSIXct(data$create_time), format = "%H:%M:%S")
+```
+
+```{r}
+data$Time <- strptime(data$Time, format = "%H:%M:%S")
+data$Time <- as.POSIXct(data$Time)
+
+ggplot(data, aes(x = Time, y = like)) +
+  geom_point() +
+  scale_x_datetime(date_labels = "%H:%M:%S") +  
+  labs(x = "Thời gian đăng bài", y = "Lượt like") +  
+  ggtitle("Mối tương quan giữa thời gian đăng bài và lượt like")  
+
+```
+
+```{r}
+ggplot(data, aes(x = Time, y = share)) +
+  geom_point() +  
+  scale_x_datetime(date_labels = "%H:%M:%S") +  
+  labs(x = "Thời gian đăng bài", y = "Lượt share") +  
+  ggtitle("Mối tương quan giữa thời gian đăng bài và lượt share")  
+```
+
+```{r}
+ggplot(data, aes(x = Time, y = comment)) +
+  geom_point() +  
+  scale_x_datetime(date_labels = "%H:%M:%S") +  
+  labs(x = "Thời gian đăng bài", y = "Comment") +  
+  ggtitle("Mối tương quan giữa thời gian đăng bài và lượt comment")  
+```
+
+```{r}
+# Chuyển đổi TDM thành ma trận dữ liệu numeric
+tdm_numeric <- as.matrix(myTdm)
+
+correlation_matrix <- cor(t(myTdm))
+
+# Tính toán ma trận tương quan
+correlation_matrix <- cor(subset_tdm)
+
+# Vẽ biểu đồ heatmap từ ma trận tương quan
+heatmap(correlation_matrix, Rowv=NA, Colv=NA, col = heat.colors(256))
+
+```
+
