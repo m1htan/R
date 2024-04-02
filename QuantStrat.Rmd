@@ -9,7 +9,6 @@ output: html_document
 
 ```{r}
 install.packages("devtools")
-install.packages("PerformanceAnalytics")
 ```
 
 ```{r}
@@ -23,14 +22,13 @@ install_github("braverock/quantstrat")
 library(devtools)
 library(blotter)
 library(quantstrat)
-library(PerformanceAnalytics)
 ```
 
 # Xác định mã cổ phiếu muốn thu thập dữ liệu và số vốn ban đầu
 
 ```{r}
 options("getSymbols.warning4.0"=FALSE)
-from ="2000-01-01"
+from ="2014-01-01"
 to ="2024-01-04"
 symbols = c("NKE")
 currency("USD")
@@ -61,4 +59,50 @@ getPortfolio("buyHold")
 getAccount("buyHold")
 ```
 
-\#
+# Minh hoạ ứng dụng trong việc mua và bán cổ phiếu
+
+## Lấy dữ liệu về giá, thời gian và số lượng cổ phiếu cần mua
+
+```{r}
+Nike.Buy.Date <- first(time(NKE))
+Nike.Buy.Price <- as.numeric(Ad(NKE[Nike.Buy.Date, ]))
+Nike.Sell.Date <- last(time(NKE))
+Nike.Sell.Price <- as.numeric(Ad(NKE[Nike.Sell.Date, ]))
+Nike.Qty <- trunc(initEq / (2 * Nike.Buy.Price))
+```
+
+## Thêm giao dịch mua vào hệ thống
+
+```{r}
+addTxn(Portfolio = "buyHold", 
+       Symbol = "NKE", 
+       TxnDate = Nike.Buy.Date, 
+       TxnQty = Nike.Qty,
+       TxnPrice = Nike.Buy.Price,
+       TxnFees = 0)
+```
+
+## Thêm giao dịch bán vào hệ thống
+
+```{r}
+addTxn(Portfolio = "buyHold", 
+       Symbol = "NKE", 
+       TxnDate = Nike.Sell.Date, 
+       TxnQty = -Nike.Qty,
+       TxnPrice = Nike.Sell.Price,
+       TxnFees = 0)
+```
+
+## Cập nhật tài khoản dựa trên các giao dịch đã thêm
+
+```{r}
+updatePortf(Portfolio = "buyHold")
+updateAcct(name = "buyHold")
+updateEndEq(Account = "buyHold")
+```
+
+## Vẽ biểu đồ
+
+```{r}
+chart.Posn("buyHold", Symbol = "NKE")
+```
