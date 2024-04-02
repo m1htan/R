@@ -1,0 +1,32 @@
+---
+title: "QuantMod"
+author: "Nguyễn Đức Minh Tân"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Install và cài đặt các thư viện cần thiết
+
+```{r}
+install.packages("quantmod")
+library(quantmod)
+```
+
+## Chọn bộ data về cổ phiếu công ty Nike
+
+```{r}
+getSymbols("NKE", from='2000-01-01',to='2024-01-04')
+head(NKE)
+show(NKE)
+```
+
+## Hiện các cột cần thiết
+
+```{r}
+Open <- Op(NKE)   #Open Price
+High <- Hi(NKE)    # High price
+Low <- Lo(NKE)  # Low price
+Close<- Cl(NKE)   #Close Price
+Volume <- Vo(NKE)   #Volume
+AdjClose <- Ad(NKE) # Adjusted close
+```

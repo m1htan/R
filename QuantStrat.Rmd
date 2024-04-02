@@ -1,0 +1,64 @@
+---
+title: "QuantStrat"
+author: "Nguyễn Đức Minh Tân"
+date: "2024-04-02"
+output: html_document
+---
+
+# Cài đặt các thư viện cần thiết
+
+```{r}
+install.packages("devtools")
+install.packages("PerformanceAnalytics")
+```
+
+```{r}
+install_github("braverock/blotter")
+install_github("braverock/quantstrat")
+```
+
+# Sử dụng thư viện
+
+```{r}
+library(devtools)
+library(blotter)
+library(quantstrat)
+library(PerformanceAnalytics)
+```
+
+# Xác định mã cổ phiếu muốn thu thập dữ liệu và số vốn ban đầu
+
+```{r}
+options("getSymbols.warning4.0"=FALSE)
+from ="2000-01-01"
+to ="2024-01-04"
+symbols = c("NKE")
+currency("USD")
+getSymbols(symbols, from=from, to=to, 
+           adjust=TRUE)
+stock(symbols, currency="USD", multiplier=1)
+initEq=10^6
+```
+
+# Khởi tạo tài khoản và danh mục đầu tư
+
+```{r}
+rm("account.buyHold",pos=.blotter)
+rm("portfolio.buyHold",pos=.blotter)
+
+initPortf("buyHold", symbol=symbols)
+initAcct("buyHold", portfolios = "buyHold",
+         initEq = initEq)
+```
+
+# Các chỉ số của tài khoản và danh mục đầu tư
+
+```{r}
+# Thông tin chi tiết về danh mục:
+getPortfolio("buyHold")
+
+# Thông tin về tài khoản liên quan đến danh mục:
+getAccount("buyHold")
+```
+
+\#
