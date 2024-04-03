@@ -5,14 +5,14 @@ date: "2024-04-01"
 output: html_document
 ---
 
-# 1. Install packages
+# 1. Cài đặt các gói cần thiết
 
 ```{r}
 install.packages("quantmod")
 install.packages("TTR")
 ```
 
-# 2. Use Library
+# 2. Sử dụng thư viện
 
 ```{r}
 library(TTR)
@@ -45,35 +45,37 @@ QuarterVoYa <- apply.quarterly(Vo(NKE),sum)
 YearVoYa <- apply.yearly(Vo(NKE),sum)
 ```
 
-## Simple Moving Average
+# 4.Technical Indicators
+
+## 4.1 SMA (Simple Moving Average)
 
 ```{r}
 sma <-SMA(Cl(NKE),n=20)
 tail(sma,n=5)
 ```
 
-## Exponential moving average
+## 4.2 EMA (Exponential Moving Average)
 
 ```{r}
 ema <-EMA(Cl(NKE),n=20)
 tail(ema,n=5)
 ```
 
-## Bollinger band
+## 4.3 Bollinger band
 
 ```{r}
 bb <-BBands(Cl(NKE),s.d=2)
 tail(bb,n=5)
 ```
 
-## Momentum
+## 4.4 Momentum
 
 ```{r}
 M <- momentum(Cl(NKE), n=2)
 head (M,n=5)
 ```
 
-## ROC
+## 4.5 ROC
 
 ```{r}
 ROC <- ROC(Cl(NKE),n=2)
@@ -81,7 +83,7 @@ ROC <- ROC(Cl(NKE),n=2)
 head(ROC,n=5)
 ```
 
-## MACD
+## 4.6 MACD
 
 ```{r}
 macd <- MACD(Cl(NKE), nFast=12, nSlow=26,
@@ -89,7 +91,7 @@ macd <- MACD(Cl(NKE), nFast=12, nSlow=26,
 tail(macd,n=5)
 ```
 
-## RSI
+## 4.7 RSI
 
 ```{r}
 rsi = RSI(Cl(NKE), n=14)
@@ -122,7 +124,7 @@ signal<-reclass(signal,price)
 tail(signal, n=3)
 ```
 
-## Chart of Nike
+# 5. Chart of Nike
 
 ```{r pressure, echo=FALSE}
 chartSeries(NKE,
@@ -152,7 +154,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting SMA
+## 5.1 Charting SMA
 
 ```{r}
 chartSeries(NKE,
@@ -160,7 +162,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting EMA
+## 5.2 Charting EMA
 
 ```{r}
 chartSeries(NKE,
@@ -168,7 +170,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting Bollinger band
+## 5.3 Charting Bollinger band
 
 ```{r}
 chartSeries(NKE,
@@ -176,7 +178,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting Momentum
+## 5.4 Charting Momentum
 
 ```{r}
 chartSeries(NKE,
@@ -184,7 +186,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting ROC
+## 5.5 Charting ROC
 
 ```{r}
 chartSeries(NKE,
@@ -192,7 +194,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting MACD
+## 5.6 Charting MACD
 
 ```{r}
 chartSeries(NKE,
@@ -200,7 +202,7 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting RSI
+## 5.7 Charting RSI
 
 ```{r}
 chartSeries(NKE,
@@ -208,11 +210,106 @@ chartSeries(NKE,
             theme=chartTheme('white'))
 ```
 
-### Charting Custom TA
+## 5.8 Charting Custom TA
 
 ```{r}
 sma <- SMA(Cl(NKE),n=14)
 chartSeries(NKE,
             subset='2007-05::2009-01',
             theme=chartTheme('white'))
+```
+
+## 5.9 Charting Price changes of two stocks
+
+```{r}
+stocklist <- c("NKE","GOOG","MSFT")
+getSymbols(stocklist)
+
+NS <- function(xdat) xdat / coredata(xdat)[1]
+a <- NS(Cl(NKE))-1
+g <- NS(Cl(GOOG))-1
+m <- NS(Cl(MSFT))-1
+chartSeries(a,
+            subset = '2007',
+            theme=chartTheme('white'))
+addTA(g, on=1, col="red", lty="dotted")
+addTA(m, on=1, col="blue", lty="dashed")
+```
+
+# 6. Performance Evaluation
+
+```{r}
+install.packages("PerformanceAnalytics")
+library(PerformanceAnalytics)
+
+```
+
+# 7. Evaluating Trading Rules
+
+## 7.1 Simple filter Buy
+
+```{r}
+price <- Cl(NKE) # close price
+r <- price/Lag(price) - 1 # % price change
+delta <-0.005 #threshold
+signal <-c(0) # first date has no signal
+
+#Loop over all trading days (except the first)
+for (i in 2: length(price)){
+  if (r[i] > delta){
+    signal[i]<- 1
+  } else
+    signal[i]<- 0
+}
+# Each data is not attached with time
+head(signal, n=3)
+## [1] 0 0 0
+# Assign time to action variable using reclass;
+signal<-reclass(signal,price)
+
+# Each point is now attached with time
+tail(signal, n=3)
+# Charting with Trading rule
+chartSeries(NKE,
+            type = 'line',
+            subset="2009-08::2009-09-15",
+            theme=chartTheme('white'))
+addTA(signal,type='S',col='red')
+```
+
+```{r}
+trade <- Lag(signal,1) # trade based on yesterday signal
+```
+
+```{r}
+ret<-dailyReturn(NKE)*trade
+names(ret)<-"filter"
+#Performance Summary
+charts.PerformanceSummary(ret, main="Naive Buy Rule")
+```
+
+## 7.2 Simple fiter buy-sell
+
+```{r}
+library(quantmod)
+getSymbols("NKE")
+price <- Cl(MSFT)
+r <- price/Lag(price) - 1
+delta<-0.005
+signal <-c(NA) # first signal is NA
+
+for (i in 2: length(Cl(MSFT))){
+  if (r[i] > delta){
+    signal[i]<- 1
+  } else if (r[i]< -delta){
+    signal[i]<- -1
+  } else
+    signal[i]<- 0
+}
+signal<-reclass(signal,Cl(MSFT))
+
+trade1 <- Lag(signal)
+ret1<-dailyReturn(MSFT)*trade1
+names(ret1) <- 'Naive'
+charts.PerformanceSummary(ret1)
 ```
