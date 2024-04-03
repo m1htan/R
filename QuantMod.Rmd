@@ -1,26 +1,31 @@
 ---
 title: "QuantMod"
 author: "Nguyễn Đức Minh Tân"
-date: "`r Sys.Date()`"
+date: "2024-04-01"
 output: html_document
 ---
 
-## Install và cài đặt các thư viện cần thiết
+# 1. Install packages
 
 ```{r}
 install.packages("quantmod")
+install.packages("TTR")
+```
+
+# 2. Use Library
+
+```{r}
+library(TTR)
 library(quantmod)
 ```
 
-## Chọn bộ data về cổ phiếu công ty Nike
+# 3. Downloading data
 
 ```{r}
-getSymbols("NKE", from='2000-01-01',to='2024-01-04')
-head(NKE)
-show(NKE)
+getSymbols("NKE", from='2000-01-01',to='2024-04-01')
 ```
 
-## Hiện các cột cần thiết
+## 3.1 Extract Columns
 
 ```{r}
 Open <- Op(NKE)   #Open Price
@@ -29,4 +34,185 @@ Low <- Lo(NKE)  # Low price
 Close<- Cl(NKE)   #Close Price
 Volume <- Vo(NKE)   #Volume
 AdjClose <- Ad(NKE) # Adjusted close
+```
+
+## 3.2 Sum Of Columns
+
+```{r}
+WeekVoYa<- apply.weekly(Vo(NKE),sum)
+MonthVoYa <- apply.monthly(Vo(NKE),sum)
+QuarterVoYa <- apply.quarterly(Vo(NKE),sum)
+YearVoYa <- apply.yearly(Vo(NKE),sum)
+```
+
+## Simple Moving Average
+
+```{r}
+sma <-SMA(Cl(NKE),n=20)
+tail(sma,n=5)
+```
+
+## Exponential moving average
+
+```{r}
+ema <-EMA(Cl(NKE),n=20)
+tail(ema,n=5)
+```
+
+## Bollinger band
+
+```{r}
+bb <-BBands(Cl(NKE),s.d=2)
+tail(bb,n=5)
+```
+
+## Momentum
+
+```{r}
+M <- momentum(Cl(NKE), n=2)
+head (M,n=5)
+```
+
+## ROC
+
+```{r}
+ROC <- ROC(Cl(NKE),n=2)
+# 2-day ROC
+head(ROC,n=5)
+```
+
+## MACD
+
+```{r}
+macd <- MACD(Cl(NKE), nFast=12, nSlow=26,
+             nSig=9, maType=SMA)
+tail(macd,n=5)
+```
+
+## RSI
+
+```{r}
+rsi = RSI(Cl(NKE), n=14)
+tail(rsi,n=5)
+```
+
+## Buying Signal
+
+```{r}
+price <- Cl(NKE) 
+r <- price/Lag(price) - 1 
+delta <-0.005 
+signal <-c(0) 
+
+#Loop over all trading days (except the first)
+for (i in 2: length(price)){
+  if (r[i] > delta){
+    signal[i]<- 1
+  } else
+    signal[i]<- 0
+}
+
+# Each data is not attached with time
+head(signal, n=3)
+
+# Assign time to action variable using reclass;
+signal<-reclass(signal,price)
+
+# Each point is now attached with time
+tail(signal, n=3)
+```
+
+## Chart of Nike
+
+```{r pressure, echo=FALSE}
+chartSeries(NKE,
+            type="line",
+            subset='2007',
+            theme=chartTheme('white'))
+```
+
+```{r pressure, echo=FALSE}
+chartSeries(NKE,
+            type="bar",
+            subset='2007-05::2007-06',
+            theme=chartTheme('white'))
+```
+
+```{r pressure, echo=FALSE}
+chartSeries(NKE,
+            type="candlesticks",
+            subset='2007-05',
+            theme=chartTheme('white'))
+```
+
+```{r pressure, echo=FALSE}
+chartSeries(NKE,
+            type="auto",
+            subset='2007-05-10::2007-05-30',
+            theme=chartTheme('white'))
+```
+
+### Charting SMA
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2009-01',
+            theme=chartTheme('white'))
+```
+
+### Charting EMA
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2009-01',
+            theme=chartTheme('white'))
+```
+
+### Charting Bollinger band
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2009-01',
+            theme=chartTheme('white'))
+```
+
+### Charting Momentum
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2009-01',
+            theme=chartTheme('white'))
+```
+
+### Charting ROC
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2008-01',
+            theme=chartTheme('white'))
+```
+
+### Charting MACD
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2008-01',
+            theme=chartTheme('white'))
+```
+
+### Charting RSI
+
+```{r}
+chartSeries(NKE,
+            subset='2007-05::2009-01',
+            theme=chartTheme('white'))
+```
+
+### Charting Custom TA
+
+```{r}
+sma <- SMA(Cl(NKE),n=14)
+chartSeries(NKE,
+            subset='2007-05::2009-01',
+            theme=chartTheme('white'))
 ```
