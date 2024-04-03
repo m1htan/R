@@ -5,7 +5,7 @@ date: "2024-04-02"
 output: html_document
 ---
 
-# Cài đặt các thư viện cần thiết
+# 1. Cài đặt các thư viện cần thiết
 
 ```{r}
 install.packages("devtools")
@@ -16,7 +16,7 @@ install_github("braverock/blotter")
 install_github("braverock/quantstrat")
 ```
 
-# Sử dụng thư viện
+# 2. Sử dụng thư viện
 
 ```{r}
 library(devtools)
@@ -24,7 +24,7 @@ library(blotter)
 library(quantstrat)
 ```
 
-# Xác định mã cổ phiếu muốn thu thập dữ liệu và số vốn ban đầu
+# 3. Xác định mã cổ phiếu muốn thu thập dữ liệu và số vốn ban đầu
 
 ```{r}
 options("getSymbols.warning4.0"=FALSE)
@@ -38,7 +38,7 @@ stock(symbols, currency="USD", multiplier=1)
 initEq=10^6
 ```
 
-# Khởi tạo tài khoản và danh mục đầu tư
+# 4. Khởi tạo tài khoản và danh mục đầu tư
 
 ```{r}
 rm("account.buyHold",pos=.blotter)
@@ -49,7 +49,7 @@ initAcct("buyHold", portfolios = "buyHold",
          initEq = initEq)
 ```
 
-# Các chỉ số của tài khoản và danh mục đầu tư
+# 5. Xem các chỉ số của tài khoản và danh mục đầu tư
 
 ```{r}
 # Thông tin chi tiết về danh mục:
@@ -59,9 +59,9 @@ getPortfolio("buyHold")
 getAccount("buyHold")
 ```
 
-# Chiến lược mua và giữ
+# 6. Chiến lược mua và giữ
 
-## Lấy dữ liệu về giá, thời gian và số lượng cổ phiếu cần mua
+## 6.1 Lấy dữ liệu về giá, thời gian và số lượng cổ phiếu cần mua
 
 ```{r}
 Nike.Buy.Date <- first(time(NKE))
@@ -71,7 +71,7 @@ Nike.Sell.Price <- as.numeric(Ad(NKE[Nike.Sell.Date, ]))
 Nike.Qty <- trunc(initEq / (2 * Nike.Buy.Price))
 ```
 
-## Thêm giao dịch mua vào hệ thống
+## 6.2 Thêm giao dịch mua vào hệ thống
 
 ```{r}
 addTxn(Portfolio = "buyHold", 
@@ -82,7 +82,7 @@ addTxn(Portfolio = "buyHold",
        TxnFees = 0)
 ```
 
-## Thêm giao dịch bán vào hệ thống
+## 6.3 Thêm giao dịch bán vào hệ thống
 
 ```{r}
 addTxn(Portfolio = "buyHold", 
@@ -93,7 +93,7 @@ addTxn(Portfolio = "buyHold",
        TxnFees = 0)
 ```
 
-## Cập nhật tài khoản dựa trên các giao dịch đã thêm
+## 6.4 Cập nhật tài khoản dựa trên các giao dịch đã thêm
 
 ```{r}
 updatePortf(Portfolio = "buyHold")
@@ -101,22 +101,22 @@ updateAcct(name = "buyHold")
 updateEndEq(Account = "buyHold")
 ```
 
-## Vẽ biểu đồ
+## 6.5 Vẽ biểu đồ
 
 ```{r}
 chart.Posn("buyHold", Symbol = "NKE")
 ```
 
-## Xem xét các số liệu thống kê giao dịch
+## 6.6 Xem xét các số liệu thống kê giao dịch
 
 ```{r}
 out <- perTradeStats("buyHold", "NKE")
 t(out)
 ```
 
-# **Quy tắc lọc mua** 
+# **7. Quy tắc lọc mua**
 
-## Tạo một Portfolio mới
+## 7.1 Tạo một Portfolio mới
 
 ```{r}
 rm("account.filter",pos=.blotter)
@@ -128,7 +128,7 @@ initAcct("filter", portfolios = "filter",
          initEq = initEq)
 ```
 
-## Tạo chỉ báo giao dịch
+## 7.2 Tạo chỉ báo giao dịch
 
 ```{r}
 price <- Cl(NKE)         
@@ -145,14 +145,14 @@ for (i in 2: length(price)){
 }
 ```
 
-## Chuyển đổi chỉ báo giao dịch thành tín hiệu giao dịch
+## 7.3 Chuyển đổi chỉ báo giao dịch thành tín hiệu giao dịch
 
 ```{r}
 trade <- Lag(signal)
 trade <- na.fill(trade,0)
 ```
 
-## Tạo giao dịch mua và bán
+## 7.4 Tạo giao dịch mua và bán
 
 ```{r}
 for (i in 1:length(price)){
@@ -175,7 +175,7 @@ for (i in 1:length(price)){
 }
 ```
 
-## Cập nhật tài khoản **dựa trên các giao dịch đã thêm**
+## 7.5 Cập nhật tài khoản **dựa trên các giao dịch đã thêm**
 
 ```{r}
 updatePortf(Portfolio = "filter")
@@ -183,15 +183,243 @@ updateAcct(name = "filter")
 updateEndEq(Account = "filter")
 ```
 
-## Vẽ biểu đồ
+## 7.6 Vẽ biểu đồ
 
 ```{r}
 chart.Posn("filter", Symbol = "NKE")
 ```
 
-## Xem xét các số liệu thống kê giao dịch
+## 7.7 Xem xét các số liệu thống kê giao dịch
 
 ```{r}
 out2 <- perTradeStats("filter", "NKE")
 t(out2)
+```
+
+# 8. SMA (Simple Moving Average)
+
+## 8.1 Tạo một Portfolio mới
+
+```{r}
+currency("USD")
+strategy.st <- portfolio.st <- account.st <- "SMA"
+rm.strat(strategy.st)
+
+
+initPortf(portfolio.st, symbols)
+initAcct(account.st, portfolios=portfolio.st, 
+         initEq = initEq)
+initOrders(portfolio.st)
+strategy(strategy.st, store=TRUE)
+```
+
+## 8.2 Tạo chỉ báo
+
+```{r}
+add.indicator(
+  strategy.st, name="SMA",
+  arguments=list(x=quote(Cl(mktdata)), n=30),
+  label="sma30")
+
+add.indicator(
+  strategy.st, name="SMA",
+  arguments=list(x=quote(Cl(mktdata)), n=200),
+  label="sma200")
+```
+
+## 8.3 Tín hiệu giao dịch
+
+```{r}
+# Buy market if SMA30>SMA200
+add.signal(
+  strategy.st, 
+  name="sigComparison",
+  arguments=list(columns=c("sma30","sma200"),
+                 relationship="gt"),
+  label="buy")
+
+# Sell market if SMA30<SMA200
+add.signal(
+  strategy.st, 
+  name="sigComparison",
+  arguments=list(columns=c("sma30","sma200"), 
+                 relationship="lt"), 
+  label="sell")
+```
+
+## 8.4 Quy tắc giao dịch
+
+```{r}
+# Buy Rule
+add.rule(strategy.st, 
+         name='ruleSignal', 
+         arguments = list(sigcol="buy", 
+                          sigval=TRUE,  
+                          orderqty=1000, 
+                          ordertype='market', 
+                          orderside='long', 
+                          pricemethod='market', 
+                          replace=FALSE), 
+         type='enter', 
+         path.dep=TRUE)
+
+
+# Sell Rule
+add.rule(strategy.st, 
+         name='ruleSignal', 
+         arguments = list(sigcol="sell", 
+                          sigval=TRUE,  
+                          orderqty='all', 
+                          ordertype='market', 
+                          orderside='long', 
+                          pricemethod='market', 
+                          replace=FALSE), 
+         type='exit', 
+         path.dep=TRUE) 
+```
+
+## 8.5 Cập nhật tài khoản **dựa trên các giao dịch đã thêm**
+
+```{r}
+updatePortf(portfolio.st)
+updateAcct(portfolio.st)
+updateEndEq(account.st)
+```
+
+## 8.6 Vẽ biểu đồ
+
+```{r}
+for(symbol in symbols) {
+  chart.Posn(Portfolio=portfolio.st,
+             Symbol=symbol,log=TRUE)
+}
+```
+
+## 8.7 Xem xét các số liệu thống kê giao dịch
+
+```{r}
+out3<-try(applyStrategy(strategy.st, 
+                       portfolios=portfolio.st))
+```
+
+# 9. **Quy tắc SMA với bộ lọc biến động**
+
+## 9.1 Tạo một Portfolio mới
+
+```{r}
+strategy.st <- portfolio.st <- account.st <- "SMAv"
+rm.strat("SMAv")
+
+initPortf(portfolio.st, symbols=symbols,
+          from=from, to=to, currency='USD')
+initAcct(account.st, portfolios=portfolio.st, 
+         from=from, to=to, currency='USD',
+         initEq=initEq)
+initOrders(portfolio.st, from=from, to=to)
+strategy(strategy.st, store=TRUE)
+```
+
+## 9.2 Tạo một chỉ báo
+
+```{r}
+RB <- function(x,n){
+  x <- x
+  sd <- runSD(x, n, sample= FALSE)
+  med <- runMedian(sd,n)
+  mavg <- SMA(x,n)
+  signal <- ifelse(sd < med & x > mavg,1,0)
+  colnames(signal) <- "RB"
+  reclass(signal,x)
+}
+```
+
+### 9.2.1 Định nghĩa chỉ báo
+
+```{r}
+add.indicator(
+  strategy.st, name="SMA",
+  arguments=list(x=quote(Cl(mktdata)), n=30),
+  label="sma30")
+
+add.indicator(
+  strategy.st, name="SMA",
+  arguments=list(x=quote(Cl(mktdata)), n=200),
+  label="sma200")
+
+add.indicator(
+  strategy.st, name="RB",
+  arguments=list(x=quote(Cl(mktdata)), n=200),
+  label="RB")
+```
+
+## 9.3 Tín hiệu giao dịch
+
+```{r}
+# Buy market if RB>=1
+add.signal(strategy.st, 
+           name="sigThreshold", 
+           arguments = list(threshold=1, column="RB",
+                            relationship="gte",
+                            cross=TRUE),
+           label="buy")
+
+# Sell market if SMA30<SMA200
+add.signal(strategy.st, 
+           name="sigComparison",
+           arguments=list(columns=c("sma30","sma200"), 
+                          relationship="lt"), 
+           label="sell")
+```
+
+## 9.4 Quy tắc giao dịch
+
+```{r}
+# Buy Rule
+add.rule(strategy.st, 
+         name='ruleSignal', 
+         arguments = list(sigcol="buy", 
+                          sigval=TRUE,  
+                          orderqty=1000, 
+                          ordertype='market', 
+                          orderside='long', 
+                          pricemethod='market', 
+                          replace=FALSE), 
+         type='enter', 
+         path.dep=TRUE)
+
+# Sell Rule
+add.rule(strategy.st, 
+         name='ruleSignal', 
+         arguments = list(sigcol="sell", 
+                          sigval=TRUE,  
+                          orderqty='all', 
+                          ordertype='market', 
+                          orderside='long', 
+                          pricemethod='market', 
+                          replace=FALSE), 
+         type='exit', 
+         path.dep=TRUE) 
+```
+
+## 9.5 Cập nhật tài khoản **dựa trên các giao dịch đã thêm**
+
+```{r}
+updatePortf(portfolio.st)
+updateAcct(portfolio.st)
+updateEndEq(account.st)
+```
+
+## 9.6 Xem xét các số liệu thống kê giao dịch
+
+```{r}
+out4<-try(applyStrategy(strategy.st,
+                       portfolios=portfolio.st))
+```
+
+## 9.7 Vẽ biểu đồ
+
+```{r}
+chart.Posn(Portfolio=portfolio.st,
+           Symbol="NKE",
+           log=TRUE)
 ```
