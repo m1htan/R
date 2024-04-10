@@ -1,0 +1,6 @@
+---
+title: "Bài tập cuối kỳ"
+author: "Nguyễn Đức Minh Tân"
+date: "2024-04-10"
+output: html_document
+---
