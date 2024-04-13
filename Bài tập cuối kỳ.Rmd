@@ -4,3 +4,61 @@ author: "Nguyễn Đức Minh Tân"
 date: "2024-04-10"
 output: html_document
 ---
+
+## Import dữ liệu về cổ phiếu cần phân tích
+
+```{r}
+# Xoá toàn bộ data đang lưu trữ trong bộ nhớ
+rm(list = ls())
+```
+
+```{r}
+# Lấy dữ liệu về cổ phiếu ngân hàng ACB 
+ACB <- read.csv('/Users/minhtan/Downloads/ACB_stock.csv')
+
+# Lấy dữ liệu về cổ phiếu ngân hàng BAB 
+BAB <- read.csv('/Users/minhtan/Downloads/BAB_stock.csv')
+
+# Lấy dữ liệu về cổ phiếu ngân hàng VCB 
+VCB <- read.csv('/Users/minhtan/Downloads/VCB_stock.csv')
+```
+
+## Kiểm tra tập dữ liệu
+
+### Kiểm tra dữ liệu bị thiếu trong tập dữ liệu
+
+```{r}
+#ACB
+# Tính số lượng giá trị bị thiếu trong mỗi cột
+missing_values <- colSums(is.na(ACB))
+
+# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
+total_missing <- sum(is.na(ACB))
+
+print(missing_values)
+print(total_missing)
+```
+
+```{r}
+#BAB
+# Tính số lượng giá trị bị thiếu trong mỗi cột
+missing_values <- colSums(is.na(BAB))
+
+# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
+total_missing <- sum(is.na(BAB))
+
+print(missing_values)
+print(total_missing)
+```
+
+```{r}
+#VCB
+# Tính số lượng giá trị bị thiếu trong mỗi cột
+missing_values <- colSums(is.na(VCB))
+
+# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
+total_missing <- sum(is.na(VCB))
+
+print(missing_values)
+print(total_missing)
+```
