@@ -62,3 +62,9 @@ total_missing <- sum(is.na(VCB))
 print(missing_values)
 print(total_missing)
 ```
+
+## EDA tập dữ liệu
+
+```{r}
+
+```
