@@ -5,6 +5,18 @@ date: "2024-04-10"
 output: html_document
 ---
 
+## Tải về và cài đặt các thư viện cần thiết
+
+```{r}
+# Install packages
+install.packages(ggplot2)
+```
+
+```{r}
+# Run library
+library(ggplot2)
+```
+
 ## Import dữ liệu về cổ phiếu cần phân tích
 
 ```{r}
@@ -14,13 +26,13 @@ rm(list = ls())
 
 ```{r}
 # Lấy dữ liệu về cổ phiếu ngân hàng ACB 
-ACB <- read.csv('/Users/minhtan/Downloads/ACB_stock.csv')
+ACB <- read.csv('C://Users/Minh Tan/Downloads/ACB_stock.csv')
 
 # Lấy dữ liệu về cổ phiếu ngân hàng BAB 
-BAB <- read.csv('/Users/minhtan/Downloads/BAB_stock.csv')
+BAB <- read.csv('C://Users/Minh Tan/Downloads/BAB_stock.csv')
 
 # Lấy dữ liệu về cổ phiếu ngân hàng VCB 
-VCB <- read.csv('/Users/minhtan/Downloads/VCB_stock.csv')
+VCB <- read.csv('C://Users/Minh Tan/Downloads/VCB_stock.csv')
 ```
 
 ## Kiểm tra tập dữ liệu
@@ -65,6 +77,45 @@ print(total_missing)
 
 ## EDA tập dữ liệu
 
-```{r}
+### Kiểm tra tổng quan bộ dữ liệu
 
+```{r}
+#ACB
+head(ACB)
+str(ACB)
+summary(ACB)
+```
+
+```{r}
+#BAB
+head(BAB)
+str(BAB)
+summary(BAB)
+```
+
+```{r}
+#VCB
+head(VCB)
+str(VCB)
+summary(VCB)
+```
+
+### Trực quan hóa dữ liệu các cột bằng biểu đồ
+
+```{r}
+# ACB
+# Open, Close, High, Low, Volume
+ggplot(ACB, aes(x=basicPrice)) + geom_histogram()
+
+# Tính hệ số tương quan Pearson giữa hai cột
+cor(ACB$open, ACB$close, use = "complete.obs")
+ggplot(ACB, aes(x=open, y=close)) + geom_point()
+```
+
+```{r}
+# BAB
+```
+
+```{r}
+#VCB
 ```
