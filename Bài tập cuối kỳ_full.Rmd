@@ -1,0 +1,121 @@
+---
+title: "Bài tập cuối kỳ"
+author: "Nguyễn Đức Minh Tân"
+date: "2024-04-10"
+output: html_document
+---
+
+## Tải về và cài đặt các thư viện cần thiết
+
+```{r}
+# Install packages
+install.packages(ggplot2)
+```
+
+```{r}
+# Run library
+library(ggplot2)
+```
+
+## Import dữ liệu về cổ phiếu cần phân tích
+
+```{r}
+# Xoá toàn bộ data đang lưu trữ trong bộ nhớ
+rm(list = ls())
+```
+
+```{r}
+# Lấy dữ liệu về cổ phiếu ngân hàng ACB 
+ACB <- read.csv('C://Users/Minh Tan/Downloads/ACB_stock.csv')
+
+# Lấy dữ liệu về cổ phiếu ngân hàng BAB 
+BAB <- read.csv('C://Users/Minh Tan/Downloads/BAB_stock.csv')
+
+# Lấy dữ liệu về cổ phiếu ngân hàng VCB 
+VCB <- read.csv('C://Users/Minh Tan/Downloads/VCB_stock.csv')
+```
+
+## Kiểm tra tập dữ liệu
+
+### Kiểm tra dữ liệu bị thiếu trong tập dữ liệu
+
+```{r}
+#ACB
+# Tính số lượng giá trị bị thiếu trong mỗi cột
+missing_values <- colSums(is.na(ACB))
+
+# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
+total_missing <- sum(is.na(ACB))
+
+print(missing_values)
+print(total_missing)
+```
+
+```{r}
+#BAB
+# Tính số lượng giá trị bị thiếu trong mỗi cột
+missing_values <- colSums(is.na(BAB))
+
+# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
+total_missing <- sum(is.na(BAB))
+
+print(missing_values)
+print(total_missing)
+```
+
+```{r}
+#VCB
+# Tính số lượng giá trị bị thiếu trong mỗi cột
+missing_values <- colSums(is.na(VCB))
+
+# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
+total_missing <- sum(is.na(VCB))
+
+print(missing_values)
+print(total_missing)
+```
+
+## EDA tập dữ liệu
+
+### Kiểm tra tổng quan bộ dữ liệu
+
+```{r}
+#ACB
+head(ACB)
+str(ACB)
+summary(ACB)
+```
+
+```{r}
+#BAB
+head(BAB)
+str(BAB)
+summary(BAB)
+```
+
+```{r}
+#VCB
+head(VCB)
+str(VCB)
+summary(VCB)
+```
+
+### Trực quan hóa dữ liệu các cột bằng biểu đồ
+
+```{r}
+# ACB
+# Open, Close, High, Low, Volume
+ggplot(ACB, aes(x=basicPrice)) + geom_histogram()
+
+# Tính hệ số tương quan Pearson giữa hai cột
+cor(ACB$open, ACB$close, use = "complete.obs")
+ggplot(ACB, aes(x=open, y=close)) + geom_point()
+```
+
+```{r}
+# BAB
+```
+
+```{r}
+#VCB
+```
