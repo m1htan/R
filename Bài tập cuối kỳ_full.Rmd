@@ -25,6 +25,7 @@ rm(list = ls())
 ```
 
 ```{r}
+# Win
 # Lấy dữ liệu về cổ phiếu ngân hàng ACB 
 ACB <- read.csv('C://Users/Minh Tan/Downloads/ACB_stock.csv')
 
@@ -33,6 +34,18 @@ BAB <- read.csv('C://Users/Minh Tan/Downloads/BAB_stock.csv')
 
 # Lấy dữ liệu về cổ phiếu ngân hàng VCB 
 VCB <- read.csv('C://Users/Minh Tan/Downloads/VCB_stock.csv')
+```
+
+```{r}
+# Mac
+# Lấy dữ liệu về cổ phiếu ngân hàng ACB 
+ACB <- read.csv('/Users/minhtan/Downloads/ACB_stock.csv')
+
+# Lấy dữ liệu về cổ phiếu ngân hàng BAB 
+BAB <- read.csv('/Users/minhtan/Downloads/BAB_stock.csv')
+
+# Lấy dữ liệu về cổ phiếu ngân hàng VCB 
+VCB <- read.csv('/Users/minhtan/Downloads/VCB_stock.csv')
 ```
 
 ## Kiểm tra tập dữ liệu
