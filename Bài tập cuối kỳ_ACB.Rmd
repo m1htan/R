@@ -73,10 +73,10 @@ ggplot(ACB, aes(x=basicPrice)) + geom_histogram()
 
 ```{r}
 # open, close, high, low, nmVolume, nmValue
-ggplot(ACB, aes(x=open)) + geom_histogram()
-ggplot(ACB, aes(x=close)) + geom_histogram()
-ggplot(ACB, aes(x=high)) + geom_histogram()
-ggplot(ACB, aes(x=low)) + geom_histogram()
+ggplot(ACB, aes(x=open)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB, aes(x=close)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB, aes(x=high)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB, aes(x=low)) + geom_histogram(binwidth = 1) + geom_histogram()
 ggplot(ACB, aes(x=nmVolume)) + geom_histogram()
 ggplot(ACB, aes(x=nmValue)) + geom_histogram()
 ```
