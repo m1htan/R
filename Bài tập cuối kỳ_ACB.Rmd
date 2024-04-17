@@ -9,7 +9,7 @@ output: html_document
 
 ```{r}
 # Install packages
-install.packages(tidyverse)
+install.packages('tidyverse')
 ```
 
 ```{r}
