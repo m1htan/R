@@ -53,36 +53,99 @@ print(missing_values)
 print(total_missing)
 ```
 
+### Giữ lại các cột cần thiết
+
+```{r}
+ACB_1 <- subset(ACB, select = c(code, date, time, open, high, low, close, nmVolume))
+head(ACB_1)
+```
+
 ## EDA tập dữ liệu
 
 ### Kiểm tra tổng quan bộ dữ liệu
 
 ```{r}
-#ACB
-head(ACB)
-str(ACB)
-summary(ACB)
+dim(ACB_1)
+```
+
+```{r}
+str(ACB_1)
+```
+
+```{r}
+summary(ACB_1)
 ```
 
 ### Trực quan hóa dữ liệu các cột bằng biểu đồ
 
 ```{r}
-# ACB
-ggplot(ACB, aes(x=basicPrice)) + geom_histogram()
-```
-
-```{r}
 # open, close, high, low, nmVolume, nmValue
-ggplot(ACB, aes(x=open)) + geom_histogram(binwidth = 1) + geom_histogram()
-ggplot(ACB, aes(x=close)) + geom_histogram(binwidth = 1) + geom_histogram()
-ggplot(ACB, aes(x=high)) + geom_histogram(binwidth = 1) + geom_histogram()
-ggplot(ACB, aes(x=low)) + geom_histogram(binwidth = 1) + geom_histogram()
-ggplot(ACB, aes(x=nmVolume)) + geom_histogram()
-ggplot(ACB, aes(x=nmValue)) + geom_histogram()
+ggplot(ACB_1, aes(x=open)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_1, aes(x=close)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_1, aes(x=high)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_1, aes(x=low)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_1, aes(x=nmVolume)) + geom_histogram()
 ```
 
 ```{r}
 # Tính hệ số tương quan Pearson giữa hai cột open và close
-cor(ACB$open, ACB$close, use = "complete.obs")
-ggplot(ACB, aes(x=open, y=close)) + geom_point()
+cor(ACB_1$open, ACB_1$close, use = "complete.obs")
+ggplot(ACB_1, aes(x=open, y=close)) + geom_point()
+```
+
+### Dùng phương pháp IQR để kiểm tra outlier
+
+```{r}
+# Hàm để phát hiện ngoại lệ dựa trên phương pháp IQR
+  Q1 <- quantile(ACB_1$open, 0.25)
+  Q3 <- quantile(ACB_1$open, 0.75)
+  IQR <- Q3 - Q1
+  
+limit_iqr = 1.5*IQR
+lower_iqr = Q1 - limit_iqr
+upper_iqr = Q3 + limit_iqr
+
+ouliers_index_iqr <- which(ACB_1$open > upper_iqr | ACB_1$open < lower_iqr)
+print(paste("Number of outliers:", length(ouliers_index_iqr)))
+
+ACB_2 <- ACB_1[-ouliers_index_iqr,]
+print(paste("Number of Non-outliers:", length(ACB_2)))
+```
+
+```{r}
+# R
+# Tạo hàm tự động xác định và loại bỏ outliers bằng phương pháp STD
+find_outliers_std <- function(data) {
+  # tính giá trị biên Upper/Lower
+  mean_data <- mean(data)
+  std_data <- sd(data)
+  limit = 3*std_data
+  lower = mean_data - limit
+  upper = mean_data + limit
+  # xác định outliers
+  ouliers_index <- which(data > upper | data < lower)
+  # Thông báo thông tin về các outliers đã xóa
+  if (length(ouliers_index) > 0 ) {
+    message(paste("Number of outliers:", length(ouliers_index)))
+    message(paste("Number of Non-outliers:", length(data_new_iqr)))
+  # return the data with the outliers removed
+  return(data[-ouliers_index])
+  } else {
+    message("Not outliers")
+  }
+}
+```
+
+```{r}
+# Boxplot
+
+ggplot(ACB_1, aes(y = open)) +
+  geom_boxplot() +
+  labs(title = "Biểu Đồ Boxplot cho ACB.HM.Close",
+       y = "ACB.HM.Close") +
+  theme_minimal()
+boxplot(ACB_1$high, main="Boxplot of 'high' Column", ylab="high Price")
+boxplot(ACB_1$low, main="Boxplot of 'low' Column", ylab="low Price")
+boxplot(ACB_1$close, main="Boxplot of 'close' Column", ylab="close Price")
+boxplot(ACB_1$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
 ```
