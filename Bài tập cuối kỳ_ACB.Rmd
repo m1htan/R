@@ -42,21 +42,13 @@ ACB <- read.csv('/Users/minhtan/Downloads/ACB_stock.csv')
 ### Kiểm tra dữ liệu bị thiếu trong tập dữ liệu
 
 ```{r}
-#ACB
-# Tính số lượng giá trị bị thiếu trong mỗi cột
-missing_values <- colSums(is.na(ACB))
-
-# Tính tổng số lượng giá trị bị thiếu trong toàn bộ tập dữ liệu
-total_missing <- sum(is.na(ACB))
-
-print(missing_values)
-print(total_missing)
+colSums(is.na(ACB_1))
 ```
 
 ### Giữ lại các cột cần thiết
 
 ```{r}
-ACB_1 <- subset(ACB, select = c(code, date, time, open, high, low, close, nmVolume))
+ACB_1 <- subset(ACB, select = c(date, time, open, high, low, close, nmVolume))
 head(ACB_1)
 ```
 
@@ -74,6 +66,22 @@ str(ACB_1)
 
 ```{r}
 summary(ACB_1)
+summary(ACB_2)
+```
+
+### Kiểm tra dữ liệu trùng lặp
+
+```{r}
+# Kiểm tra dữ liệu trùng lặp
+n_occur <- data.frame(table(ACB_1$date))
+n_occur[n_occur$Freq > 1,]
+ACB_1[ACB_1$date %in% n_occur$Var1[n_occur$Freq > 1],]
+```
+
+```{r}
+# Xoá dữ liệu trùng lặp
+ACB_2 <- ACB_1[!duplicated(ACB_1$date), ]
+ACB_2
 ```
 
 ### Trực quan hóa dữ liệu các cột bằng biểu đồ
@@ -91,61 +99,64 @@ ggplot(ACB_1, aes(x=nmVolume)) + geom_histogram()
 # Tính hệ số tương quan Pearson giữa hai cột open và close
 cor(ACB_1$open, ACB_1$close, use = "complete.obs")
 ggplot(ACB_1, aes(x=open, y=close)) + geom_point()
+
+# Tính hệ số tương quan Pearson giữa hai cột open và high
+cor(ACB_1$open, ACB_1$high, use = "complete.obs")
+ggplot(ACB_1, aes(x=open, y=high)) + geom_point()
+
+# Tính hệ số tương quan Pearson giữa hai cột open và low
+cor(ACB_1$open, ACB_1$low, use = "complete.obs")
+ggplot(ACB_1, aes(x=open, y=low)) + geom_point()
+
+# Tính hệ số tương quan Pearson giữa hai cột high và close
+cor(ACB_1$high, ACB_1$close, use = "complete.obs")
+ggplot(ACB_1, aes(x=high, y=close)) + geom_point()
+
+# Tính hệ số tương quan Pearson giữa hai cột low và close
+cor(ACB_1$low, ACB_1$close, use = "complete.obs")
+ggplot(ACB_1, aes(x=low, y=close)) + geom_point()
 ```
 
-### Dùng phương pháp IQR để kiểm tra outlier
+### Xác định và loại bỏ các giá trị outlier
 
 ```{r}
-# Hàm để phát hiện ngoại lệ dựa trên phương pháp IQR
-  Q1 <- quantile(ACB_1$open, 0.25)
-  Q3 <- quantile(ACB_1$open, 0.75)
-  IQR <- Q3 - Q1
-  
-limit_iqr = 1.5*IQR
-lower_iqr = Q1 - limit_iqr
-upper_iqr = Q3 + limit_iqr
+# Xác định giá trị outlier trong data frame
+outlier_values_nmVolume <- boxplot.stats(ACB_2$nmVolume)$out 
 
-ouliers_index_iqr <- which(ACB_1$open > upper_iqr | ACB_1$open < lower_iqr)
-print(paste("Number of outliers:", length(ouliers_index_iqr)))
+# Xác định vị trí các outlier trong data frame.
+id_nmVolume<- which(ACB_2$nmVolume %in% outlier_values_nmVolume)
 
-ACB_2 <- ACB_1[-ouliers_index_iqr,]
-print(paste("Number of Non-outliers:", length(ACB_2)))
-```
-
-```{r}
-# R
-# Tạo hàm tự động xác định và loại bỏ outliers bằng phương pháp STD
-find_outliers_std <- function(data) {
-  # tính giá trị biên Upper/Lower
-  mean_data <- mean(data)
-  std_data <- sd(data)
-  limit = 3*std_data
-  lower = mean_data - limit
-  upper = mean_data + limit
-  # xác định outliers
-  ouliers_index <- which(data > upper | data < lower)
-  # Thông báo thông tin về các outliers đã xóa
-  if (length(ouliers_index) > 0 ) {
-    message(paste("Number of outliers:", length(ouliers_index)))
-    message(paste("Number of Non-outliers:", length(data_new_iqr)))
-  # return the data with the outliers removed
-  return(data[-ouliers_index])
-  } else {
-    message("Not outliers")
-  }
-}
+id <- unique(c(id_nmVolume))
+id
+# Xoá Outlier
+ACB_3 <- ACB_2[-id,]
 ```
 
 ```{r}
-# Boxplot
+# Kiểm tra lại bằng Boxplot
 
-ggplot(ACB_1, aes(y = open)) +
-  geom_boxplot() +
-  labs(title = "Biểu Đồ Boxplot cho ACB.HM.Close",
-       y = "ACB.HM.Close") +
-  theme_minimal()
-boxplot(ACB_1$high, main="Boxplot of 'high' Column", ylab="high Price")
-boxplot(ACB_1$low, main="Boxplot of 'low' Column", ylab="low Price")
-boxplot(ACB_1$close, main="Boxplot of 'close' Column", ylab="close Price")
-boxplot(ACB_1$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
+boxplot(ACB_3$open, main="Boxplot of 'open' Column", ylab="open Price")
+boxplot(ACB_3$high, main="Boxplot of 'high' Column", ylab="high Price")
+boxplot(ACB_3$low, main="Boxplot of 'low' Column", ylab="low Price")
+boxplot(ACB_3$close, main="Boxplot of 'close' Column", ylab="close Price")
+boxplot(ACB_3$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
+
+# Kiểm tra lại bằng Histogram
+
+ggplot(ACB_3, aes(x=open)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_3, aes(x=close)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_3, aes(x=high)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_3, aes(x=low)) + geom_histogram(binwidth = 1) + geom_histogram()
+ggplot(ACB_3, aes(x=nmVolume)) + geom_histogram()
+```
+
+## Vẽ biểu đồ
+
+```{r}
+# Giá mở cửa qua từng năm
+ggplot(ACB, aes(x = date, y = open)) +
+  geom_line() +
+  ggtitle("Opening Price Over Time") +
+  xlab("Date") +
+  ylab("Open Price")
 ```
