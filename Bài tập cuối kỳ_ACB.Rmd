@@ -67,6 +67,7 @@ str(ACB_1)
 ```{r}
 summary(ACB_1)
 summary(ACB_2)
+summary(ACB_3)
 ```
 
 ### Kiểm tra dữ liệu trùng lặp
@@ -97,24 +98,28 @@ ggplot(ACB_1, aes(x=nmVolume)) + geom_histogram()
 
 ```{r}
 # Tính hệ số tương quan Pearson giữa hai cột open và close
-cor(ACB_1$open, ACB_1$close, use = "complete.obs")
-ggplot(ACB_1, aes(x=open, y=close)) + geom_point()
+cor(ACB_3$open, ACB_3$close, use = "complete.obs")
+ggplot(ACB_3, aes(x=open, y=close)) + geom_point()
 
 # Tính hệ số tương quan Pearson giữa hai cột open và high
-cor(ACB_1$open, ACB_1$high, use = "complete.obs")
-ggplot(ACB_1, aes(x=open, y=high)) + geom_point()
+cor(ACB_3$open, ACB_3$high, use = "complete.obs")
+ggplot(ACB_3, aes(x=open, y=high)) + geom_point()
 
 # Tính hệ số tương quan Pearson giữa hai cột open và low
-cor(ACB_1$open, ACB_1$low, use = "complete.obs")
-ggplot(ACB_1, aes(x=open, y=low)) + geom_point()
+cor(ACB_3$open, ACB_3$low, use = "complete.obs")
+ggplot(ACB_3, aes(x=open, y=low)) + geom_point()
 
 # Tính hệ số tương quan Pearson giữa hai cột high và close
-cor(ACB_1$high, ACB_1$close, use = "complete.obs")
-ggplot(ACB_1, aes(x=high, y=close)) + geom_point()
+cor(ACB_3$high, ACB_3$close, use = "complete.obs")
+ggplot(ACB_3, aes(x=high, y=close)) + geom_point()
 
 # Tính hệ số tương quan Pearson giữa hai cột low và close
-cor(ACB_1$low, ACB_1$close, use = "complete.obs")
-ggplot(ACB_1, aes(x=low, y=close)) + geom_point()
+cor(ACB_3$low, ACB_3$close, use = "complete.obs")
+ggplot(ACB_3, aes(x=low, y=close)) + geom_point()
+
+# Tính hệ số tương quan Pearson giữa hai cột high và low
+cor(ACB_3$high, ACB_3$low, use = "complete.obs")
+ggplot(ACB_3, aes(x=high, y=low)) + geom_point()
 ```
 
 ### Xác định và loại bỏ các giá trị outlier
@@ -135,12 +140,15 @@ ACB_3 <- ACB_2[-id,]
 ```{r}
 # Kiểm tra lại bằng Boxplot
 
-boxplot(ACB_3$open, main="Boxplot of 'open' Column", ylab="open Price")
-boxplot(ACB_3$high, main="Boxplot of 'high' Column", ylab="high Price")
-boxplot(ACB_3$low, main="Boxplot of 'low' Column", ylab="low Price")
-boxplot(ACB_3$close, main="Boxplot of 'close' Column", ylab="close Price")
-boxplot(ACB_3$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
+boxplot(ACB_2$open, ACB_3$close, ACB_3$high, ACB_3$low,
+        main = "Boxplot of 'open', 'high', 'low', and 'close' Columns",
+        names = c("open", "high", "low", "close"),
+        ylab = "Price", xlab = "Columns",
+        col = c("blue", "red", "green", "orange"))
+boxplot(ACB_2$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
+```
 
+```{r}
 # Kiểm tra lại bằng Histogram
 
 ggplot(ACB_3, aes(x=open)) + geom_histogram(binwidth = 1) + geom_histogram()
@@ -150,13 +158,48 @@ ggplot(ACB_3, aes(x=low)) + geom_histogram(binwidth = 1) + geom_histogram()
 ggplot(ACB_3, aes(x=nmVolume)) + geom_histogram()
 ```
 
+### Chuyển định dạng dữ liệu cột date
+
+```{r}
+ACB_3$date <- as.Date(ACB_3$date)
+summary(ACB_3)
+```
+
 ## Vẽ biểu đồ
 
 ```{r}
 # Giá mở cửa qua từng năm
-ggplot(ACB, aes(x = date, y = open)) +
+ggplot(ACB_3, aes(x = date, y = open)) +
   geom_line() +
   ggtitle("Opening Price Over Time") +
   xlab("Date") +
   ylab("Open Price")
+
+# Giá đóng cửa qua từng năm
+ggplot(ACB_3, aes(x = date, y = close)) +
+  geom_line() +
+  ggtitle("Closing Price Over Time") +
+  xlab("Date") +
+  ylab("Close Price")
+
+# Khối lượng giao dịch qua từng năm
+ggplot(ACB_3, aes(x = date, y = nmVolume)) +
+  geom_line() +
+  ggtitle("Volume Over Time") +
+  xlab("Date") +
+  ylab("nmVolume")
+
+# Giá giao dịch cao nhất qua từng năm
+ggplot(ACB_3, aes(x = date, y = high)) +
+  geom_line() +
+  ggtitle("High Price Over Time") +
+  xlab("Date") +
+  ylab("High")
+
+# Giá giao dịch thấp nhất qua từng năm
+ggplot(ACB_3, aes(x = date, y = low)) +
+  geom_line() +
+  ggtitle("Low Price Over Time") +
+  xlab("Date") +
+  ylab("Low")
 ```
