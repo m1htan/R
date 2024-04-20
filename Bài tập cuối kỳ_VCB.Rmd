@@ -1,5 +1,5 @@
 ---
-title: "ACB"
+title: "VCB"
 author: "Nguyễn Đức Minh Tân"
 date: "2024-04-10"
 output: html_document
@@ -28,13 +28,14 @@ rm(list = ls())
 ```{r}
 # Win
 # Lấy dữ liệu về cổ phiếu ngân hàng ACB 
-ACB <- read.csv('C://Users/Minh Tan/Downloads/ACB_stock.csv')
+VCB <- read.csv('C://Users/Minh Tan/Downloads/VCB_stock.csv')
+head(VCB)
 ```
 
 ```{r}
 # Mac
 # Lấy dữ liệu về cổ phiếu ngân hàng ACB 
-ACB <- read.csv('/Users/minhtan/Downloads/ACB_stock.csv')
+VCB <- read.csv('/Users/minhtan/Downloads/VCB_stock.csv')
 ```
 
 ## Kiểm tra tập dữ liệu
@@ -42,14 +43,14 @@ ACB <- read.csv('/Users/minhtan/Downloads/ACB_stock.csv')
 ### Kiểm tra dữ liệu bị thiếu trong tập dữ liệu
 
 ```{r}
-colSums(is.na(ACB_1))
+colSums(is.na(VCB_1))
 ```
 
 ### Giữ lại các cột cần thiết
 
 ```{r}
-ACB_1 <- subset(ACB, select = c(date, time, open, high, low, close, nmVolume))
-head(ACB_1)
+VCB_1 <- subset(ACB, select = c(date, time, open, high, low, close, nmVolume))
+head(VCB_1)
 ```
 
 ## EDA tập dữ liệu
@@ -57,32 +58,32 @@ head(ACB_1)
 ### Kiểm tra tổng quan bộ dữ liệu
 
 ```{r}
-dim(ACB_1)
+dim(VCB_1)
 ```
 
 ```{r}
-str(ACB_1)
+str(VCB_1)
 ```
 
 ```{r}
-summary(ACB_1)
-summary(ACB_2)
-summary(ACB_3)
+summary(VCB_1)
+summary(VCB_2)
+summary(VCB_3)
 ```
 
 ### Kiểm tra dữ liệu trùng lặp
 
 ```{r}
 # Kiểm tra dữ liệu trùng lặp
-n_occur <- data.frame(table(ACB_1$date))
+n_occur <- data.frame(table(VCB_1$date))
 n_occur[n_occur$Freq > 1,]
-ACB_1[ACB_1$date %in% n_occur$Var1[n_occur$Freq > 1],]
+VCB_1[VCB_1$date %in% n_occur$Var1[n_occur$Freq > 1],]
 ```
 
 ```{r}
 # Xoá dữ liệu trùng lặp
-ACB_2 <- ACB_1[!duplicated(ACB_1$date), ]
-ACB_2
+VCB_2 <- VCB_1[!duplicated(ACB_1$date), ]
+VCB_2
 ```
 
 ### Trực quan hóa dữ liệu các cột bằng biểu đồ
@@ -125,17 +126,6 @@ ggplot(ACB_3, aes(x=high, y=low)) + geom_point()
 ### Xác định và loại bỏ các giá trị outlier
 
 ```{r}
-# Boxplot trước khi xóa outlier
-
-boxplot(ACB_2$open, ACB_2$close, ACB_2$high, ACB_2$low,
-        main = "Boxplot of 'open', 'high', 'low', and 'close' Columns",
-        names = c("open", "high", "low", "close"),
-        ylab = "Price", xlab = "Columns",
-        col = c("blue", "red", "green", "orange"))
-boxplot(ACB_2$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
-```
-
-```{r}
 # Xác định giá trị outlier trong data frame
 outlier_values_nmVolume <- boxplot.stats(ACB_2$nmVolume)$out 
 
@@ -151,12 +141,12 @@ ACB_3 <- ACB_2[-id,]
 ```{r}
 # Kiểm tra lại bằng Boxplot
 
-boxplot(ACB_3$open, ACB_3$close, ACB_3$high, ACB_3$low,
+boxplot(ACB_2$open, ACB_3$close, ACB_3$high, ACB_3$low,
         main = "Boxplot of 'open', 'high', 'low', and 'close' Columns",
         names = c("open", "high", "low", "close"),
         ylab = "Price", xlab = "Columns",
         col = c("blue", "red", "green", "orange"))
-boxplot(ACB_3$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
+boxplot(ACB_2$nmVolume, main="Boxplot of 'nmVolume' Column", ylab="Trading volume")
 ```
 
 ```{r}
@@ -172,8 +162,8 @@ ggplot(ACB_3, aes(x=nmVolume)) + geom_histogram()
 ### Chuyển định dạng dữ liệu cột date
 
 ```{r}
-ACB_3$date <- as.Date(ACB_3$date)
-summary(ACB_3)
+VCB_3$date <- as.Date(VCB_3$date)
+summary(VCB_3)
 ```
 
 ## Vẽ biểu đồ
