@@ -48,7 +48,7 @@ colSums(is.na(ACB_1))
 ### Giữ lại các cột cần thiết
 
 ```{r}
-ACB_1 <- subset(ACB, select = c(date, time, open, high, low, close, nmVolume))
+ACB_1 <- subset(ACB, select = c(date, open, high, low, close, nmVolume))
 head(ACB_1)
 ```
 
@@ -213,4 +213,39 @@ ggplot(ACB_3, aes(x = date, y = low)) +
   ggtitle("Low Price Over Time") +
   xlab("Date") +
   ylab("Low")
+```
+
+\##########################################################################################
+
+# **Phương pháp phân tích**
+
+## Technical analysis with Quantmod
+
+### Install thư viện 
+
+```{r}
+install.packages("quantmod")
+install.packages("TTR")
+```
+
+### Khởi chạy các thư viện cần thiết
+
+```{r}
+library(quantmod)
+library(xts)
+library(TTR)
+```
+
+### Vẽ biểu đồ
+
+```{r}
+# Chuyển đổi cột 'Date' sang kiểu dữ liệu ngày tháng của R
+ACB_3$date <- as.Date(ACB_3$date)
+
+# Chuyển đổi dữ liệu sang đối tượng xts, sử dụng cột 'Date' làm chỉ số
+ACB_4 <- xts(ACB_3[, -which(names(ACB_3) == "date")], order.by = ACB_3$date)
+```
+
+```{r}
+chartSeries(ACB_4, type="line", subset="2013::2023", theme=chartTheme("white"))
 ```
