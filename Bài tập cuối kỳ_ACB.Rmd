@@ -249,3 +249,9 @@ ACB_4 <- xts(ACB_3[, -which(names(ACB_3) == "date")], order.by = ACB_3$date)
 ```{r}
 chartSeries(ACB_4, type="line", subset="2013::2023", theme=chartTheme("white"))
 ```
+
+### Các chỉ báo kỹ thuật
+
+```{r}
+
+```
