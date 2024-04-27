@@ -221,7 +221,7 @@ ggplot(ACB_3, aes(x = date, y = low)) +
 
 ## Technical analysis with Quantmod
 
-### Install thư viện 
+### Install thư viện
 
 ```{r}
 install.packages("quantmod")
