@@ -10,12 +10,19 @@ output: html_document
 ```{r}
 # Install packages
 install.packages('tidyverse')
+install.packages("quantmod")
+install.packages("TTR")
+install.packages("PerformanceAnalytics")
 ```
 
 ```{r}
 # Run library
 library(ggplot2)
 library(tidyverse)
+library(quantmod)
+library(xts)
+library(TTR)
+library(PerformanceAnalytics)
 ```
 
 ## Import dữ liệu về cổ phiếu cần phân tích
@@ -221,21 +228,6 @@ ggplot(ACB_3, aes(x = date, y = low)) +
 
 ## Technical analysis with Quantmod
 
-### Install thư viện
-
-```{r}
-install.packages("quantmod")
-install.packages("TTR")
-```
-
-### Khởi chạy các thư viện cần thiết
-
-```{r}
-library(quantmod)
-library(xts)
-library(TTR)
-```
-
 ### Vẽ biểu đồ
 
 ```{r}
@@ -252,6 +244,27 @@ chartSeries(ACB_4, type="line", subset="2013::2023", theme=chartTheme("white"))
 
 ### Các chỉ báo kỹ thuật
 
-```{r}
+#### Bollinger band
 
+```{r}
+bb <-BBands(Cl(ACB_3),s.d=2)
+tail(bb,n=5)
+```
+
+```{r}
+chartSeries(ACB_3, type="line", subset="2013::2023", theme=chartTheme("white"))
+addBBands(n = 20, sd = 2, maType = SMA)
+addSMA(n = 20, on = 1, col = "blue")
+```
+
+#### **Momentum**
+
+```{r}
+M <- momentum(Cl(ACB_3), n=2)
+head (M,n=5)
+```
+
+```{r}
+chartSeries(ACB_3, type="line", subset="2013::2023", theme=chartTheme("white"))
+addMomentum(n = 10)
 ```
