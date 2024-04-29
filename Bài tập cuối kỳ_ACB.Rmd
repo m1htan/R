@@ -268,3 +268,17 @@ head (M,n=5)
 chartSeries(ACB_3, type="line", subset="2013::2023", theme=chartTheme("white"))
 addMomentum(n = 10)
 ```
+
+#### Thêm các chỉ số phân tích kỹ thuật vào đồ thị
+
+```{r}
+chartSeries(ACB_3, type="line", subset="2013::2023", theme=chartTheme("white"))
+addMACD()
+addRSI()
+```
+
+### Mô hình ARIMA
+
+```{r}
+
+```
