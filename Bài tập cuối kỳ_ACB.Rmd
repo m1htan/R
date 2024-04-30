@@ -331,13 +331,50 @@ train = stock[1:breakpoint, ]
 test = stock[(breakpoint + 1):nrow(stock), ]
 ```
 
-##### Tính toán các chỉ số ACF và PACF
+##### Vòng lặp for
 
 ```{r}
-# ACF
-par(mfrow = c(1,1))
-acf.train = acf(train,main = 'ACF Plot', lag.max = 100)
+#Khởi tạo một xts object cho giá trị thực tế của log return
+nrow(train)
+```
 
-# PACF
-pacf.train = pacf(train,main = "PACF plot", lag.max = 100)
+```{r}
+a = 2024
+stock[a,]
+```
+
+```{r}
+#Lay gia tri date truoc ngay co stt a
+Actual_series = xts(0,as.Date("2021-06-03","%Y-%m-%d"))
+Actual_series
+```
+
+```{r}
+#Khởi tạo dataframe của chuỗi forecast
+forecasted_series = data.frame(STT = integer(),Forecasted = numeric(),Upper_Forecasted = numeric(),Lower_Forecasted = numeric())
+for(b in a:nrow(stock)-1){
+  stock_train = stock[1:b,]
+  stock_test = stock[-row(stock_train),]
+  
+#Summary ARIMA model
+fit = arima(stock_train,order = c(0,0,2),include.mean = FALSE)
+summary(fit)
+
+#Plotting residual plot
+#acf(fit$residuals,main="Residuals plot")
+#Forecast log returns
+arima.forecast = forecast.Arima(fit,h=1,level = 95)
+summary(arima.forecast)
+
+#Thêm giá trị dự báo vào chuỗi forecasted_series
+forecasted_series = rbind(forecasted_series,c(STT = b+1,Forecasted = arima.forecast$mean[1],arima.forecast$upper,arima.forecast$lower))
+
+#Plotting the forecast
+#par(mfrow=c(1,1))
+#plot(arima.forecast,main = "ARIMA forecast")
+#Tạo ra một chuỗi actual return của giai đoạn dự báo
+Actual_return = stock[(b+1),]
+Actual_series = c(Actual_series,xts(Actual_return))
+rm(Actual_return)
+}
 ```
