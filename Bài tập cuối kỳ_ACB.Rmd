@@ -23,6 +23,8 @@ library(quantmod)
 library(xts)
 library(TTR)
 library(PerformanceAnalytics)
+library(tseries)
+library(forecast)
 ```
 
 ## Import dữ liệu về cổ phiếu cần phân tích
@@ -279,6 +281,63 @@ addRSI()
 
 ### Mô hình ARIMA
 
-```{r}
+#### Kiểm định tính dừng
 
+```{r}
+# Đồ thị phân phối giá đóng cửa ACB
+chartSeries(ACB_4$close, type="line", subset="2013::2023", theme=chartTheme("white"), name="Biểu đồ giá đóng cửa ACB")
+
+# Kiểm định tính dừng
+print(adf.test(ACB_4$close))
+```
+
+##### Chuyển đổi dữ liệu thành chuỗi có tính dừng
+
+```{r}
+# Tạo ra một chuỗi số mới có tính dừng.
+stock = diff(log(ACB_4$close), lag = 1)
+stock = stock[!is.na(stock)]
+plot(stock,main = "log return plot")
+```
+
+```{r}
+# Kiểm định ADF kiểm tra tính dừng của chuỗi.
+print(adf.test(stock))
+```
+
+#### Lựa chọn tham số ARIMA (p, d, q)
+
+```{r}
+fit <- auto.arima(stock)
+summary(fit)
+```
+
+```{r}
+fit <- auto.arima(stock, trace = TRUE, ic = "aic", allowdrift = TRUE, stepwise = FALSE, approximation = FALSE)
+```
+
+#### Tiến hành dự đoán
+
+##### Chia tập dữ liệu thành 2 phần
+
+```{r}
+# Tính toán điểm ngắt
+breakpoint = floor(nrow(stock) * 0.8)
+
+# Tạo tập huấn luyện
+train = stock[1:breakpoint, ]
+
+# Tạo tập kiểm tra
+test = stock[(breakpoint + 1):nrow(stock), ]
+```
+
+##### Tính toán các chỉ số ACF và PACF
+
+```{r}
+# ACF
+par(mfrow = c(1,1))
+acf.train = acf(train,main = 'ACF Plot', lag.max = 100)
+
+# PACF
+pacf.train = pacf(train,main = "PACF plot", lag.max = 100)
 ```
