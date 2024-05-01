@@ -13,6 +13,7 @@ install.packages('tidyverse')
 install.packages("quantmod")
 install.packages("TTR")
 install.packages("PerformanceAnalytics")
+install.packages("xts")
 ```
 
 ```{r}
@@ -25,6 +26,7 @@ library(TTR)
 library(PerformanceAnalytics)
 library(tseries)
 library(forecast)
+library(xts)
 ```
 
 ## Import dữ liệu về cổ phiếu cần phân tích
@@ -351,7 +353,7 @@ Actual_series
 
 ```{r}
 #Khởi tạo dataframe của chuỗi forecast
-forecasted_series = data.frame(STT = integer(),Forecasted = numeric(),Upper_Forecasted = numeric(),Lower_Forecasted = numeric())
+forecasted_series = data.frame(STT = integer(),Forecasted = numeric (),Upper_Forecasted = numeric(),Lower_Forecasted = numeric())
 for(b in a:nrow(stock)-1){
   stock_train = stock[1:b,]
   stock_test = stock[-row(stock_train),]
@@ -363,7 +365,7 @@ summary(fit)
 #Plotting residual plot
 #acf(fit$residuals,main="Residuals plot")
 #Forecast log returns
-arima.forecast = forecast.Arima(fit,h=1,level = 95)
+arima.forecast = forecast(fit,h=1,level = 95)
 summary(arima.forecast)
 
 #Thêm giá trị dự báo vào chuỗi forecasted_series
@@ -377,4 +379,26 @@ Actual_return = stock[(b+1),]
 Actual_series = c(Actual_series,xts(Actual_return))
 rm(Actual_return)
 }
+```
+
+```{r}
+colnames(forecasted_series)=c("STT","Forecasted","Upper_Forecasted","Lower_Forecasted")
+print(forecasted_series)
+```
+
+#### **Kiểm tra độ chính xác của ARIMA model**
+
+```{r}
+#Điều chỉnh độ dài của chuỗi lợi suất
+Actual_series = Actual_series[-1]
+#Tạo ra object cho chuỗi được dự báo
+forecasted_series = xts(forecasted_series,index(Actual_series))
+
+#So sánh giá trị dự báo và giá trị thực tế
+plot(Actual_series,ylim=c(-0.2,0.2),main="Actual return vs Forecasted return")
+lines(forecasted_series$Forecasted,lwd=1.5,col = "blue")
+lines(forecasted_series$Upper_Forecasted,type = "l",pch = 22,lyt =1,lwd=0.5,col = "red")
+lines(forecasted_series$Lower_Forecasted,type = "l",pch = 22,lyt =1,lwd=0.5,col = "red")
+legend('bottomright',c('Actual','Forecasted',"Upper forecasted","Lower forecasted"),lty = c(1,1), lwd = c(1.5,1.5),col = c('black','blue','red','red'))
+
 ```
