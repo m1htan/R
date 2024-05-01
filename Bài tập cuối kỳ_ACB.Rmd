@@ -393,12 +393,13 @@ print(forecasted_series)
 Actual_series = Actual_series[-1]
 #Tạo ra object cho chuỗi được dự báo
 forecasted_series = xts(forecasted_series,index(Actual_series))
+```
 
+```{r}
 #So sánh giá trị dự báo và giá trị thực tế
 plot(Actual_series,ylim=c(-0.2,0.2),main="Actual return vs Forecasted return")
 lines(forecasted_series$Forecasted,lwd=1.5,col = "blue")
-lines(forecasted_series$Upper_Forecasted,type = "l",pch = 22,lyt =1,lwd=0.5,col = "red")
-lines(forecasted_series$Lower_Forecasted,type = "l",pch = 22,lyt =1,lwd=0.5,col = "red")
+lines(forecasted_series$Upper_Forecasted,type = "l",pch = 22,lwd=0.5,col = "red")
+lines(forecasted_series$Lower_Forecasted,type = "l",pch = 22,lwd=0.5,col = "red")
 legend('bottomright',c('Actual','Forecasted',"Upper forecasted","Lower forecasted"),lty = c(1,1), lwd = c(1.5,1.5),col = c('black','blue','red','red'))
-
 ```
