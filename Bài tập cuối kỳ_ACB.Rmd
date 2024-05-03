@@ -14,6 +14,7 @@ install.packages("quantmod")
 install.packages("TTR")
 install.packages("PerformanceAnalytics")
 install.packages("xts")
+install.packages("Metrics")
 ```
 
 ```{r}
@@ -402,4 +403,25 @@ lines(forecasted_series$Forecasted,lwd=1.5,col = "blue")
 lines(forecasted_series$Upper_Forecasted,type = "l",pch = 22,lwd=0.5,col = "red")
 lines(forecasted_series$Lower_Forecasted,type = "l",pch = 22,lwd=0.5,col = "red")
 legend('bottomright',c('Actual','Forecasted',"Upper forecasted","Lower forecasted"),lty = c(1,1), lwd = c(1.5,1.5),col = c('black','blue','red','red'))
+```
+
+```{r}
+#Tạo bảng giá trị actual và forecasted
+comparision = merge(Actual_series,forecasted_series$Forecasted)
+comparision$Accuracy = sign(comparision$Actual_series) == sign(comparision$Forecasted)
+print(comparision)
+```
+
+```{r}
+#tính toán mức độ chính xác
+Accuracy_percentage = sum(comparision$Accuracy ==1)*100/length(comparision$Accuracy)
+print(Accuracy_percentage)
+```
+
+#### RMSE, MAE và MAPE
+
+```{r}
+cat("RMSE:", rmse(forecasted_series$Forecasted, test), "\n")
+cat("MAE:", mae(forecasted_series$Forecasted, test), "\n")
+cat("MAPE:", mape(forecasted_series$Forecasted, test), "\n")
 ```
