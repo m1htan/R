@@ -1,0 +1,35 @@
+---
+title: "VCB"
+author: "Nguyễn Đức Minh Tân"
+date: "2024-05-04"
+output: html_document
+---
+
+# Install & run library
+
+```{r}
+library(readxl)
+```
+
+# Import data
+
+```{r}
+# Lấy dữ liệu về cổ phiếu ngân hàng ACB 
+VCB <- read.csv('C://Users/Minh Tan/Downloads/VCB_stock.csv')
+```
+
+# EDA dataset
+
+## Summary
+
+```{r}
+head(VCB)
+summary(VCB)
+```
+
+## Giữ lại các cột cần thiết
+
+```{r}
+VCB_1 <- subset(ACB, select = c(date, open, high, low, close, nmVolume))
+head(VCB_1)
+```
