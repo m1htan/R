@@ -8,12 +8,19 @@ output: html_document
 # Install & run library
 
 ```{r}
+install.packages("Metrics")
+```
+
+```{r}
 library(readxl)
 library(fpp2)
 library(quantmod)
 library(tseries)
 library(tidyverse)
 library(forecast)
+library(TTR)
+library(PerformanceAnalytics)
+library(Metrics)
 ```
 
 # Import data
@@ -126,5 +133,55 @@ print(adf.test(VCB_2$close))
 ### Chuyển đổi dữ liệu thành có tính dừng
 
 ```{r}
+closed = diff(log(VCB_2$close), lag = 1)
+print(adf.test(closed)) #sau khi chuyển đổi bằng phương pháp sai phân thì có tính dừng
+```
 
+### Lựa chọn hệ số (p, d, q)
+
+```{r}
+fitArima <- auto.arima(closed, ic='aic', trace = TRUE) #lựa chọn hệ số p d q
+print(summary(fitArima))
+```
+
+### Tiến hành dự đoán
+
+```{r}
+autoplot(forecast(fitArima, h=500))
+autoplot(forecast(fitArima3, h=500))
+
+checkresiduals(fitArima)
+checkresiduals(fitArima3)
+
+CloseForecast <- forecast(fitArima, level = c(85, 95), h=300)
+CloseForecast
+##plot(CloseForecast)
+autoplot(CloseForecast)
+
+CloseForecast1 <- forecast(fitArima3, level = c(85, 95), h=300)
+CloseForecast1
+##plot(CloseForecast1)
+autoplot(CloseForecast1)
+
+closed <-as.data.frame(closed)
+set.seed(123)
+TrainIndices <- sample(1:nrow(closed), floor(0.9*nrow(closed)))
+train <- closed[TrainIndices, ]
+tests <- closed[-TrainIndices, ]
+
+modelin <- arima(train, order = c(0, 0, 2))
+```
+
+```{r}
+ForecastIn <- forecast(modelin, h = length(tests))
+ForecastIn
+```
+
+### Đánh giá mô hình
+
+```{r}
+library(forecast)
+cat("RMSE:", rmse(ForecastIn$mean, tests), "\n")
+cat("MAE:", mae(ForecastIn$mean, tests), "\n")
+cat("MAPE:", mape(ForecastIn$mean, tests), "\n")
 ```
