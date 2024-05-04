@@ -9,9 +9,19 @@ output: html_document
 
 ```{r}
 library(readxl)
+library(fpp2)
+library(quantmod)
+library(tseries)
+library(tidyverse)
+library(forecast)
 ```
 
 # Import data
+
+```{r}
+# Xoá toàn bộ data đang lưu trữ trong bộ nhớ
+rm(list = ls())
+```
 
 ```{r}
 # Lấy dữ liệu về cổ phiếu ngân hàng ACB 
@@ -31,5 +41,90 @@ summary(VCB)
 
 ```{r}
 VCB_1 <- subset(ACB, select = c(date, open, high, low, close, nmVolume))
+VCB_1$date <- as.Date(VCB_1$date)
 head(VCB_1)
+```
+
+```{r}
+dim(VCB_1)
+nrow(VCB_1)
+ncol(VCB_1)
+str(VCB_1)
+```
+
+## Kiểm tra dữ liệu trùng lặp
+
+```{r}
+# Kiểm tra dữ liệu trùng lặp
+n_occur <- data.frame(table(VCB_1$date))
+n_occur[n_occur$Freq > 1,]
+VCB[VCB_1$date %in% n_occur$Var1[n_occur$Freq > 1],]
+
+# Xoá dữ liệu trùng lặp
+VCB_2 <- VCB_1[!duplicated(VCB_1$date), ]
+VCB_2
+```
+
+## Vẽ biểu đồ
+
+### Cột
+
+```{r}
+#Hệ số tương quan giữa hai cột open và close
+cor(VCB_2$open, VCB_2$close, use = "complete.obs")
+#Hệ số tương quan giữa hai cột open và high
+cor(VCB_2$open, VCB_2$high, use = "complete.obs")
+#Hệ số tương quan giữa hai cột open và low
+cor(VCB_2$open, VCB_2$low, use = "complete.obs")
+#Hệ số tương quan giữa hai cột high và close
+cor(VCB_2$high, VCB_2$close, use = "complete.obs")
+#Hệ số tương quan giữa hai cột high và low
+cor(VCB_2$high, VCB_2$low, use = "complete.obs")
+#Hệ số tương quan giữa hai cột low và close
+cor(VCB_2$low, VCB_2$close, use = "complete.obs")
+```
+
+### Boxplot
+
+```{r}
+bplot <- boxplot(VCB_2$open,VCB_2$close,VCB_2$high,VCB_2$low,names = c("open","close","high","low"),main="Biểu đồ boxplot 4 biến của VCB")
+```
+
+# Technical Analysis
+
+## Quantmod
+
+### Vẽ biểu đồ
+
+```{r}
+chartSeries(VCB_2,
+            type="bar",
+            subset='2013-09::2023-09',
+            theme=chartTheme('white'))
+```
+
+### Thêm các chỉ báo kĩ thuật
+
+```{r}
+chartSeries(VCB_2,
+            type="bar",
+            subset='2013-09::2023-09',
+            theme=chartTheme('white'))
+addSMA(n=200, on=1, col = "red")
+addMomentum(n=2)
+```
+
+## Forecast/Predict with ARIMA
+
+### Kiểm tra tính dừng dữ liệu
+
+```{r}
+print(adf.test(VCB_2$close))
+# Kết luận tập dữ liệu không có tính dừng
+```
+
+### Chuyển đổi dữ liệu thành có tính dừng
+
+```{r}
+
 ```
