@@ -421,6 +421,7 @@ print(Accuracy_percentage)
 #### RMSE, MAE và MAPE
 
 ```{r}
+library(Metrics)
 cat("RMSE:", rmse(forecasted_series$Forecasted, test), "\n")
 cat("MAE:", mae(forecasted_series$Forecasted, test), "\n")
 cat("MAPE:", mape(forecasted_series$Forecasted, test), "\n")
